@@ -1,0 +1,89 @@
+name: Build Intel macOS DMG
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-intel-dmg:
+    # Intel runner: this is deliberately not macos-latest (Apple Silicon).
+    runs-on: macos-15-intel
+    timeout-minutes: 360
+    steps:
+      - name: Check out source and submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Verify Intel runner
+        run: |
+          set -euo pipefail
+          test "$(uname -m)" = "x86_64"
+          echo "Runner: $(sw_vers -productVersion) / $(uname -m)"
+
+      - name: Install native build tools
+        run: |
+          brew update
+          brew install llvm@21 zig cmake protobuf
+          echo "$(brew --prefix llvm@21)/bin" >> "$GITHUB_PATH"
+          echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
+          echo "LLVM_OBJCOPY=$(brew --prefix llvm@21)/bin/llvm-objcopy" >> "$GITHUB_ENV"
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            . -> target
+            desktop -> desktop/target
+
+      - name: Build headless firmware and Rust daemon prerequisites
+        env:
+          LLVM_OBJCOPY: ${{ env.LLVM_OBJCOPY }}
+        run: |
+          set -euo pipefail
+          # This project script configures build-headless, builds all firmware
+          # and codec archives, extracts Mach-O-safe codec objects, builds the
+          # Rust CLI/server static libraries, and links the headless binary.
+          bash scripts/build-headless.sh
+
+      - name: Build embedded daemon static library
+        run: |
+          set -euo pipefail
+          cargo build --release --locked -p rockbox-embed -p rockbox-server
+          (cd zig && zig build lib -Doptimize=ReleaseFast)
+          test -s zig/zig-out/lib/librockboxd.a
+
+      - name: Build desktop client with embedded daemon
+        run: |
+          set -euo pipefail
+          test -s zig/zig-out/lib/librockboxd.a
+          cd desktop
+          cargo build --release --locked
+          test -s target/release/rockbox-desktop
+          file target/release/rockbox-desktop
+          lipo -archs target/release/rockbox-desktop | grep -q x86_64
+
+      - name: Package DMG
+        run: |
+          set -euo pipefail
+          bash desktop/package-macos.sh
+          test -s desktop/dist/Rockbox.dmg
+          hdiutil verify desktop/dist/Rockbox.dmg
+          shasum -a 256 desktop/dist/Rockbox.dmg | tee desktop/dist/Rockbox.dmg.sha256
+          file desktop/dist/Rockbox.dmg
+
+      - name: Upload Intel DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: Rockbox-Intel-macOS-12-compatible
+          path: |
+            desktop/dist/Rockbox.dmg
+            desktop/dist/Rockbox.dmg.sha256
+          if-no-files-found: error
+          retention-days: 14

@@ -867,11 +867,13 @@ fn complete_eq_bands(bands: Vec<EqBandJson>) -> Vec<EqBandSettingMessage> {
             gain: band.gain,
         })
         .collect();
-    bands.extend((bands.len()..ROCKBOX_EQ_BAND_COUNT).map(|_| EqBandSettingMessage {
-        cutoff: 1000,
-        q: 10,
-        gain: 0,
-    }));
+    bands.extend(
+        (bands.len()..ROCKBOX_EQ_BAND_COUNT).map(|_| EqBandSettingMessage {
+            cutoff: 1000,
+            q: 10,
+            gain: 0,
+        }),
+    );
     bands
 }
 
@@ -882,11 +884,31 @@ mod eq_preset_tests {
     #[test]
     fn five_band_presets_clear_the_remaining_rockbox_bands() {
         let bands = complete_eq_bands(vec![
-            EqBandJson { cutoff: 60, q: 7, gain: 35 },
-            EqBandJson { cutoff: 200, q: 10, gain: 45 },
-            EqBandJson { cutoff: 800, q: 10, gain: 5 },
-            EqBandJson { cutoff: 4000, q: 10, gain: 25 },
-            EqBandJson { cutoff: 12000, q: 7, gain: 30 },
+            EqBandJson {
+                cutoff: 60,
+                q: 7,
+                gain: 35,
+            },
+            EqBandJson {
+                cutoff: 200,
+                q: 10,
+                gain: 45,
+            },
+            EqBandJson {
+                cutoff: 800,
+                q: 10,
+                gain: 5,
+            },
+            EqBandJson {
+                cutoff: 4000,
+                q: 10,
+                gain: 25,
+            },
+            EqBandJson {
+                cutoff: 12000,
+                q: 7,
+                gain: 30,
+            },
         ]);
 
         assert_eq!(bands.len(), ROCKBOX_EQ_BAND_COUNT);

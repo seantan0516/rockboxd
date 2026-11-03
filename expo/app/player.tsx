@@ -44,7 +44,7 @@ export default function PlayerScreen() {
       <SafeAreaView className="flex-1 bg-bg">
         <RemoteServerBanner />
         <View className="flex-1 items-center justify-center">
-          <Text className="text-text-secondary">No track loaded</Text>
+          <Text className="text-text-secondary">暂无正在播放的歌曲</Text>
         </View>
       </SafeAreaView>
     );
@@ -85,7 +85,7 @@ export default function PlayerScreen() {
           </Pressable>
           <View className="items-center">
             <Text className="text-text-secondary text-[11px]">
-              PLAYING FROM ALBUM
+              正在播放的专辑
             </Text>
             <Text
               numberOfLines={1}

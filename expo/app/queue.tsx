@@ -44,7 +44,7 @@ export default function QueueScreen() {
           <Ionicons name="chevron-down" size={26} color={Colors.textPrimary} />
         </Pressable>
         <Text className="text-text-primary text-base font-display">
-          Queue
+          播放队列
         </Text>
         <View className="flex-row items-center gap-3">
           <Text className="text-text-secondary text-xs font-sans">
@@ -54,9 +54,9 @@ export default function QueueScreen() {
             <Pressable
               hitSlop={8}
               onPress={() =>
-                Alert.alert("Clear Queue", "Remove all upcoming tracks?", [
-                  { text: "Cancel", style: "cancel" },
-                  { text: "Clear", style: "destructive", onPress: clearQueue },
+                Alert.alert("清空播放队列", "确定移除所有待播放歌曲吗？", [
+                  { text: "取消", style: "cancel" },
+                  { text: "清空", style: "destructive", onPress: clearQueue },
                 ])
               }
             >
@@ -70,7 +70,7 @@ export default function QueueScreen() {
       {currentTrack ? (
         <View className="px-4 pt-3 pb-2 border-b border-divider">
           <Text className="text-text-secondary text-[11px] font-bold uppercase tracking-widest mb-2 font-sans">
-            Now playing
+            正在播放
           </Text>
           <View className="flex-row items-center gap-3">
             {currentTrack.artwork ? (
@@ -107,8 +107,8 @@ export default function QueueScreen() {
       <View className="flex-row px-4 pt-3 gap-2">
         {(
           [
-            { id: "next" as const, label: "Playing Next", count: playingNext.length },
-            { id: "history" as const, label: "History", count: history.length },
+            { id: "next" as const, label: "接下来播放", count: playingNext.length },
+            { id: "history" as const, label: "播放历史", count: history.length },
           ]
         ).map((t) => {
           const active = t.id === tab;
@@ -142,8 +142,8 @@ export default function QueueScreen() {
           />
           <Text className="text-text-secondary text-sm mt-3 font-sans text-center">
             {tab === "next"
-              ? "Nothing queued after the current track yet."
-              : "No tracks have played in this session."}
+              ? "当前歌曲之后还没有待播放的歌曲。"
+              : "本次播放尚无历史记录。"}
           </Text>
         </View>
       ) : (

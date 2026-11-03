@@ -49,7 +49,7 @@ export function TrackContextMenu() {
   }[] = [
     {
       icon: isLiked ? "heart" : "heart-outline",
-      label: isLiked ? "Remove from Liked" : "Add to Liked",
+      label: isLiked ? "从我喜欢的歌曲中移除" : "添加到我喜欢的歌曲",
       onPress: () => {
         toggleLike(track.id);
         closeContextMenu();
@@ -57,7 +57,7 @@ export function TrackContextMenu() {
     },
     {
       icon: "play-skip-forward-outline",
-      label: "Play Next",
+      label: "下一首播放",
       onPress: () => {
         playNext(track);
         closeContextMenu();
@@ -65,7 +65,7 @@ export function TrackContextMenu() {
     },
     {
       icon: "list-outline",
-      label: "Play Last",
+      label: "添加到播放队列末尾",
       onPress: () => {
         playLast(track);
         closeContextMenu();
@@ -73,14 +73,14 @@ export function TrackContextMenu() {
     },
     {
       icon: "add-circle-outline",
-      label: "Add to Playlist",
+      label: "添加到播放列表",
       onPress: () => {
         setPickerOpen(true);
       },
     },
     {
       icon: "person-outline",
-      label: "Go to Artist",
+      label: "查看歌手",
       disabled: !artistId,
       onPress: () => {
         if (!artistId) return;
@@ -90,7 +90,7 @@ export function TrackContextMenu() {
     },
     {
       icon: "disc-outline",
-      label: "Go to Album",
+      label: "查看专辑",
       disabled: !albumId,
       onPress: () => {
         if (!albumId) return;
@@ -188,12 +188,12 @@ export function TrackContextMenu() {
           >
             <View className="self-center w-10 h-1 rounded-sm bg-border my-2" />
             <Text className="text-text-primary text-base font-bold text-center py-2 font-sans">
-              Add to playlist
+              添加到播放列表
             </Text>
             <ScrollView className="max-h-[60vh]">
               {playlists.length === 0 ? (
                 <Text className="text-text-secondary text-sm text-center py-6 font-sans">
-                  No playlists yet — create one first.
+                  还没有播放列表，请先创建一个。
                 </Text>
               ) : (
                 playlists.map((p) => (
@@ -204,12 +204,12 @@ export function TrackContextMenu() {
                       RockboxClient.addTrackToPlaylist(p.id, tid)
                         .then(() => {
                           if (process.env.EXPO_OS !== "web") {
-                            Alert.alert("Added", `Added to “${p.name}”.`);
+                            Alert.alert("添加成功", `已添加到“${p.name}”。`);
                           }
                         })
                         .catch((e: Error) => {
                           if (process.env.EXPO_OS !== "web") {
-                            Alert.alert("Add failed", e.message);
+                            Alert.alert("添加失败", e.message);
                           }
                         });
                       setPickerOpen(false);
@@ -234,7 +234,7 @@ export function TrackContextMenu() {
                       </Text>
                       {p.isSmart ? (
                         <Text className="text-text-muted text-xs font-sans">
-                          Smart playlist
+                          智能播放列表
                         </Text>
                       ) : null}
                     </View>

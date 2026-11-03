@@ -78,13 +78,13 @@ export default function HomeScreen() {
       >
         <View className="px-4 pt-2 pb-4 flex-row items-center justify-between">
           <Text className="text-text-primary text-[26px] font-display-extra">
-            Home
+            首页
           </Text>
           <View className="flex-row items-center gap-2">
             <Pressable
               hitSlop={8}
               onPress={() => router.push("/settings/server")}
-              accessibilityLabel="Rockbox server"
+              accessibilityLabel="Rockbox 服务器"
               className="w-9 h-9 rounded-full bg-bg-card items-center justify-center"
             >
               <IconDevices
@@ -96,7 +96,7 @@ export default function HomeScreen() {
             <Pressable
               hitSlop={8}
               onPress={() => setCastOpen(true)}
-              accessibilityLabel="AirPlay & Cast"
+              accessibilityLabel="AirPlay 与投放"
               className="w-9 h-9 rounded-full bg-bg-card items-center justify-center"
             >
               <IconCast
@@ -108,7 +108,7 @@ export default function HomeScreen() {
             <Pressable
               hitSlop={8}
               onPress={() => router.push("/settings")}
-              accessibilityLabel="Settings"
+              accessibilityLabel="设置"
               className="w-9 h-9 rounded-full bg-bg-card items-center justify-center"
             >
               <Ionicons
@@ -150,7 +150,7 @@ export default function HomeScreen() {
 
         {recentlyPlayed.length > 0 ? (
           <>
-            <SectionHeader title="Recently played" />
+            <SectionHeader title="最近播放" />
             <View className="mb-7">
               <CardRow
                 data={recentlyPlayed.map((a) => ({
@@ -169,8 +169,8 @@ export default function HomeScreen() {
         {madeForYou.length > 0 ? (
           <>
             <SectionHeader
-              title="Made for you"
-              subtitle="Smart playlists refreshed automatically"
+              title="为你推荐"
+              subtitle="智能播放列表会自动更新"
             />
             <View className="mb-7">
               <CardRow
@@ -190,14 +190,14 @@ export default function HomeScreen() {
 
         {topArtists.length > 0 ? (
           <>
-            <SectionHeader title="Your top artists" />
+            <SectionHeader title="热门艺人" />
             <View className="mb-7">
               <CardRow
                 size={130}
                 data={topArtists.map((a) => ({
                   id: a.id,
                   title: a.name,
-                  subtitle: "Artist",
+                  subtitle: "艺人",
                   image: a.image,
                   rounded: "full" as const,
                   customPlaceholder: <ArtistPlaceholder size={46} />,
@@ -210,7 +210,7 @@ export default function HomeScreen() {
 
         {popularAlbums.length > 0 ? (
           <>
-            <SectionHeader title="Popular albums" />
+            <SectionHeader title="热门专辑" />
             <CardRow
               data={popularAlbums.map((a) => ({
                 id: a.id,
@@ -234,7 +234,7 @@ export default function HomeScreen() {
               color={Colors.textMuted}
             />
             <Text className="text-text-secondary text-[14px] text-center mt-4 font-sans">
-              Library is empty — wait for the daemon to finish scanning.
+              资料库为空，请等待后台完成扫描。
             </Text>
           </View>
         ) : null}

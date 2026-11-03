@@ -99,7 +99,7 @@ export default function ServerPickerScreen() {
           <Ionicons name="chevron-back" size={26} color={Colors.textPrimary} />
         </Pressable>
         <Text className="text-text-primary text-[18px] font-display-extra">
-          Rockbox server
+          Rockbox 服务器
         </Text>
       </View>
 
@@ -125,7 +125,7 @@ export default function ServerPickerScreen() {
           {/* Current selection */}
           <View className="mt-4 px-4">
             <Text className="text-text-secondary text-xs font-bold uppercase tracking-widest mb-2 font-sans">
-              Connected to
+              已连接到
             </Text>
             <View className="bg-bg-card rounded-xl px-4 py-4">
               <View>
@@ -142,7 +142,7 @@ export default function ServerPickerScreen() {
                     className="mt-3 self-start active:opacity-70"
                   >
                     <Text className="text-danger text-xs font-semibold font-sans">
-                      Disconnect
+                      断开连接
                     </Text>
                   </Pressable>
                 ) : null}
@@ -154,11 +154,11 @@ export default function ServerPickerScreen() {
           <View className="mt-6 px-4">
             <View className="flex-row items-center justify-between mb-2">
               <Text className="text-text-secondary text-xs font-bold uppercase tracking-widest font-sans">
-                Discovered on the network
+                网络中发现的服务器
               </Text>
               {scanning && isAvailable ? (
                 <Text className="text-text-muted text-[11px] font-sans">
-                  scanning…
+                  正在扫描…
                 </Text>
               ) : null}
             </View>
@@ -168,8 +168,8 @@ export default function ServerPickerScreen() {
                 <View className="px-4 py-5">
                   <Text className="text-text-secondary text-[13px] font-sans">
                     {isAvailable
-                      ? "No rockbox servers found yet. Make sure the daemon is running on the same network."
-                      : "Native module not loaded — discovery is unavailable on this build."}
+                      ? "暂未发现 Rockbox 服务器，请确认后台服务正在同一网络中运行。"
+                      : "原生模块未加载，此版本暂不支持自动发现服务器。"}
                   </Text>
                 </View>
               ) : (
@@ -225,13 +225,13 @@ export default function ServerPickerScreen() {
           {/* Manual entry */}
           <View className="mt-6 px-4">
             <Text className="text-text-secondary text-xs font-bold uppercase tracking-widest mb-2 font-sans">
-              Connect manually
+              手动连接
             </Text>
             <View className="bg-bg-card rounded-xl px-4 py-3 gap-2.5">
               <TextInput
                 value={host}
                 onChangeText={setHost}
-                placeholder="Hostname or IP"
+                placeholder="主机名或 IP 地址"
                 placeholderTextColor={Colors.textMuted}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -240,7 +240,7 @@ export default function ServerPickerScreen() {
               <View className="h-px bg-divider" />
               <View className="flex-row items-center gap-2">
                 <Text className="text-text-secondary text-[13px] font-sans">
-                  Port
+                  端口
                 </Text>
                 <TextInput
                   value={port}
@@ -255,7 +255,7 @@ export default function ServerPickerScreen() {
                 className={`mt-2 self-start px-4 py-2 rounded-full ${host.trim().length === 0 ? "bg-bg-hover" : "bg-accent active:opacity-80"}`}
               >
                 <Text className="text-white text-[13px] font-display">
-                  Connect
+                  连接
                 </Text>
               </Pressable>
             </View>

@@ -6,10 +6,10 @@ import { Colors } from "@/constants/theme";
 
 /**
  * Standard empty-state for screens that need a connected server but don't
- * have one. Shows an icon, a short message, and a "Choose server" CTA.
+ * have one. Shows an icon, a short message, and a "选择服务器" CTA.
  */
 export function NotConnectedState({
-  message = "Connect to a rockbox server to see your library.",
+  message = "连接 Rockbox 服务器以查看音乐资料库。",
   icon = "server-outline",
 }: {
   message?: string;
@@ -26,7 +26,7 @@ export function NotConnectedState({
         className="mt-5 px-4 py-2 rounded-full bg-accent active:opacity-80"
       >
         <Text className="text-white text-[13px] font-bold font-sans">
-          Choose server
+          选择服务器
         </Text>
       </Pressable>
     </View>

@@ -59,6 +59,7 @@ import Foundation
 @_silgen_name("rb_search_json")             private func rb_search_json(_ term: UnsafePointer<CChar>) -> UnsafeMutablePointer<CChar>?
 
 @_silgen_name("rb_adjust_volume")           private func rb_adjust_volume(_ steps: Int32) -> Int32
+@_silgen_name("rb_set_eq_json")              private func rb_set_eq_json(_ config: UnsafePointer<CChar>) -> Int32
 @_silgen_name("rb_sound_current_json")      private func rb_sound_current_json(_ setting: Int32) -> UnsafeMutablePointer<CChar>?
 
 @_silgen_name("rb_save_shuffle")            private func rb_save_shuffle(_ enabled: Int32) -> Int32
@@ -293,6 +294,9 @@ public class RockboxRpcModule: Module {
             return try self.parseJsonOrThrow(takeString(raw), op: "search")
         }
 
+        AsyncFunction("setEq") { (configJson: String) -> Void in
+            if configJson.withCString({ rb_set_eq_json($0) }) != 0 { throw self.playbackError("setEq") }
+        }
         AsyncFunction("adjustVolume") { (steps: Int) -> Void in
             if rb_adjust_volume(Int32(steps)) != 0 { throw self.playbackError("adjustVolume") }
         }

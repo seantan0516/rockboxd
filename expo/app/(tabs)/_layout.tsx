@@ -20,10 +20,10 @@ const TAB_ICONS: Record<
 };
 
 const TAB_LABELS: Record<string, string> = {
-  index: "Home",
-  search: "Search",
-  library: "Your Library",
-  files: "Files",
+  index: "首页",
+  search: "搜索",
+  library: "资料库",
+  files: "文件",
 };
 
 function TabIcon({
@@ -111,10 +111,10 @@ export default function TabLayout() {
       screenOptions={{ headerShown: false }}
       backBehavior="none"
     >
-      <Tabs.Screen name="index" options={{ title: "Home" }} />
-      <Tabs.Screen name="search" options={{ title: "Search" }} />
-      <Tabs.Screen name="library" options={{ title: "Your Library" }} />
-      <Tabs.Screen name="files" options={{ title: "Files" }} />
+      <Tabs.Screen name="index" options={{ title: "首页" }} />
+      <Tabs.Screen name="search" options={{ title: "搜索" }} />
+      <Tabs.Screen name="library" options={{ title: "资料库" }} />
+      <Tabs.Screen name="files" options={{ title: "文件" }} />
     </Tabs>
   );
 }

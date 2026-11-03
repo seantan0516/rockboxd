@@ -130,6 +130,8 @@ type RockboxRpcNative = {
 
   // Sound
   adjustVolume(steps: number): Promise<void>;
+  /** Apply five-band Rockbox EQ values from a .cfg preset. */
+  setEq(configJson: string): Promise<void>;
   soundCurrent(setting: number): Promise<Json>;
 
   // Settings

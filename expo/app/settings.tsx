@@ -48,37 +48,37 @@ export default function SettingsScreen() {
   const selectedServer = useSelectedServer();
   const serverLabel = selectedServer
     ? `${selectedServer.label} (${selectedServer.host}:${selectedServer.grpcPort})`
-    : "Not connected";
+    : "未连接";
   const [devicePickerOpen, setDevicePickerOpen] = useState(false);
   const currentDevice = useCurrentDeviceLabel();
   const bottomPad = useBottomSpacing(24);
 
   const sections: Section[] = [
     {
-      title: "Playback",
+      title: "播放",
       rows: [
         {
           kind: "switch",
-          label: "Crossfade",
+          label: "淡入淡出",
           icon: "swap-horizontal-outline",
           value: crossfade,
           onChange: setCrossfade,
         },
-        { kind: "link", label: "Equalizer", icon: "options-outline" },
+        { kind: "link", label: "均衡器", icon: "options-outline", onPress: () => router.push("/settings/equalizer") },
       ],
     },
     {
-      title: "Devices",
+      title: "设备",
       rows: [
         {
           kind: "link",
-          label: "Bluetooth",
+          label: "蓝牙",
           icon: "bluetooth-outline",
           onPress: () => router.push("/settings/bluetooth"),
         },
         {
           kind: "link",
-          label: "AirPlay & Cast",
+          label: "AirPlay 与投放",
           icon: "tv-outline",
           tablerIcon: IconCast,
           value: currentDevice.name,
@@ -86,7 +86,7 @@ export default function SettingsScreen() {
         },
         {
           kind: "link",
-          label: "Rockbox server",
+          label: "Rockbox 服务器",
           icon: "server-outline",
           tablerIcon: IconDevices,
           value: serverLabel,
@@ -101,11 +101,11 @@ export default function SettingsScreen() {
       ],
     },
     {
-      title: "App",
+      title: "应用",
       rows: [
         {
           kind: "link",
-          label: "About",
+          label: "关于",
           icon: "information-circle-outline",
           value: "1.0.0",
         },
@@ -127,7 +127,7 @@ export default function SettingsScreen() {
             />
           </Pressable>
           <Text className="text-text-primary text-[22px] font-display-extra">
-            Settings
+            设置
           </Text>
         </View>
 

@@ -67,7 +67,7 @@ export default function ArtistScreen() {
     return (
       <SafeAreaView className="flex-1 bg-bg">
         <View className="flex-1 items-center justify-center">
-          <Text className="text-text-secondary">Artist not found</Text>
+          <Text className="text-text-secondary">未找到该艺人</Text>
         </View>
       </SafeAreaView>
     );
@@ -175,7 +175,7 @@ export default function ArtistScreen() {
           {topTracks.length > 0 ? (
             <View className="mt-7">
               <Text className="text-text-primary text-lg font-bold px-5 mb-2 font-sans">
-                Popular
+                热门
               </Text>
               {topTracks.map((t, idx) => {
                 const isCurrent = currentTrack?.id === t.id;
@@ -228,7 +228,7 @@ export default function ArtistScreen() {
           {albums.length > 0 ? (
             <View className="mt-8">
               <Text className="text-text-primary text-lg font-bold px-5 mb-3 font-sans">
-                Albums
+                专辑
               </Text>
               <FlatList
                 horizontal
@@ -272,7 +272,7 @@ export default function ArtistScreen() {
                       {item.title}
                     </Text>
                     <Text className="text-text-secondary text-xs mt-0.5 font-sans">
-                      Album{item.year ? ` • ${item.year}` : ""}
+                      专辑{item.year ? ` • ${item.year}` : ""}
                     </Text>
                   </Pressable>
                 )}
@@ -287,7 +287,7 @@ export default function ArtistScreen() {
         onClose={() => setMenuOpen(false)}
         header={{
           title: artist.name,
-          subtitle: "Artist",
+          subtitle: "艺人",
           image: artist.image,
           rounded: "full",
         }}
@@ -295,7 +295,7 @@ export default function ArtistScreen() {
           [
             {
               icon: "play-outline",
-              label: "Play",
+              label: "播放",
               onPress: () => {
                 setMenuOpen(false);
                 playQueue(tracks);
@@ -304,7 +304,7 @@ export default function ArtistScreen() {
             },
             {
               icon: "shuffle",
-              label: "Shuffle Play",
+              label: "随机播放",
               onPress: () => {
                 setMenuOpen(false);
                 playQueue(tracks, { shuffle: true });
@@ -313,7 +313,7 @@ export default function ArtistScreen() {
             },
             {
               icon: "list-outline",
-              label: "Add Top Songs to Queue",
+              label: "将热门歌曲加入播放队列",
               onPress: () => {
                 setMenuOpen(false);
                 topTracks.forEach((t) => playLast(t));

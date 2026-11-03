@@ -3,7 +3,7 @@ import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Alert, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
@@ -16,6 +16,7 @@ import { SeekBar } from "@/components/seek-bar";
 import { Colors } from "@/constants/theme";
 import { formatDuration } from "@/lib/mock-data";
 import { usePlayer } from "@/lib/player-context";
+import { RockboxClient } from "@/lib/rockbox-client";
 
 export default function PlayerScreen() {
   const {
@@ -53,6 +54,12 @@ export default function PlayerScreen() {
   const isLiked = liked.has(currentTrack.id);
   const repeatIcon =
     repeat === "one" ? "repeat" : repeat === "all" ? "repeat" : "repeat-outline";
+
+  const adjustVolume = (steps: number) => {
+    RockboxClient.adjustVolume(steps).catch(() => {
+      Alert.alert("音量调整失败", "请检查服务器连接后重试。");
+    });
+  };
 
   return (
     <View className="flex-1 bg-bg">
@@ -214,6 +221,17 @@ export default function PlayerScreen() {
                   1
                 </Text>
               ) : null}
+            </Pressable>
+          </View>
+
+          <View className="flex-row items-center justify-center gap-8 mt-5">
+            <Pressable hitSlop={10} onPress={() => adjustVolume(-1)} className="flex-row items-center gap-2">
+              <Ionicons name="volume-low" size={20} color={Colors.textSecondary} />
+              <Text className="text-text-secondary text-xs">音量 -</Text>
+            </Pressable>
+            <Pressable hitSlop={10} onPress={() => adjustVolume(1)} className="flex-row items-center gap-2">
+              <Ionicons name="volume-high" size={20} color={Colors.textPrimary} />
+              <Text className="text-text-primary text-xs">音量 +</Text>
             </Pressable>
           </View>
 

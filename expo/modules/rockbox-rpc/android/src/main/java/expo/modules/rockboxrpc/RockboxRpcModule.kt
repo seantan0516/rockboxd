@@ -85,6 +85,7 @@ class RockboxRpcModule : Module() {
     @JvmStatic external fun rb_search_json(term: String): String?
 
     @JvmStatic external fun rb_adjust_volume(steps: Int): Int
+    @JvmStatic external fun rb_set_eq_json(configJson: String): Int
     @JvmStatic external fun rb_sound_current_json(setting: Int): String?
 
     @JvmStatic external fun rb_save_shuffle(enabled: Int): Int
@@ -400,6 +401,10 @@ class RockboxRpcModule : Module() {
     }
     AsyncFunction("search") { term: String ->
       parseJsonOrThrow(rb_search_json(term), "search")
+    }
+
+    AsyncFunction("setEq") { configJson: String ->
+      if (rb_set_eq_json(configJson) != 0) throw RpcError("setEq")
     }
 
     AsyncFunction("adjustVolume") { steps: Int ->

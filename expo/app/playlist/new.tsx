@@ -37,7 +37,7 @@ export default function NewPlaylistScreen() {
 
   const canCreate = name.trim().length > 0;
 
-  const onCreate = () => {
+  const on创建 = () => {
     if (!canCreate) return;
     const created = createPlaylist({
       name,
@@ -60,16 +60,16 @@ export default function NewPlaylistScreen() {
       >
         <View className="flex-row items-center justify-between px-4 py-3 border-b border-divider">
           <Pressable hitSlop={10} onPress={() => router.back()}>
-            <Text className="text-text-primary text-sm font-sans">Cancel</Text>
+            <Text className="text-text-primary text-sm font-sans">取消</Text>
           </Pressable>
           <Text className="text-text-primary text-base font-display">
-            {isSmart ? "New Smart Playlist" : "New Playlist"}
+            {isSmart ? "新建智能歌单" : "新建歌单"}
           </Text>
-          <Pressable hitSlop={10} disabled={!canCreate} onPress={onCreate}>
+          <Pressable hitSlop={10} disabled={!canCreate} onPress={on创建}>
             <Text
               className={`text-sm font-display ${canCreate ? "text-accent" : "text-text-muted"}`}
             >
-              Create
+              创建
             </Text>
           </Pressable>
         </View>
@@ -107,11 +107,11 @@ export default function NewPlaylistScreen() {
             </View>
           </View>
 
-          <Section label="Name">
+          <Section label="名称">
             <TextInput
               value={name}
               onChangeText={setName}
-              placeholder={isSmart ? "Smart playlist name" : "My playlist"}
+              placeholder={isSmart ? "智能歌单名称" : "我的歌单"}
               placeholderTextColor={Colors.textMuted}
               autoFocus
               maxLength={64}
@@ -119,11 +119,11 @@ export default function NewPlaylistScreen() {
             />
           </Section>
 
-          <Section label="Description">
+          <Section label="描述">
             <TextInput
               value={description}
               onChangeText={setDescription}
-              placeholder="Optional description"
+              placeholder="可选填写描述"
               placeholderTextColor={Colors.textMuted}
               multiline
               numberOfLines={3}
@@ -135,11 +135,11 @@ export default function NewPlaylistScreen() {
 
           {isSmart ? (
             <>
-              <Section label="Rules">
+              <Section label="规则">
                 <TextInput
                   value={rules}
                   onChangeText={setRules}
-                  placeholder={`one rule per line, e.g.\ngenre = "Indie"\nyear >= 2020`}
+                  placeholder={`每行填写一条规则，例如：\ngenre = "Indie"\nyear >= 2020`}
                   placeholderTextColor={Colors.textMuted}
                   multiline
                   numberOfLines={6}
@@ -150,7 +150,7 @@ export default function NewPlaylistScreen() {
 
               <View className="px-4 mt-1">
                 <Text className="text-text-secondary text-xs font-bold mb-2 uppercase tracking-widest font-sans">
-                  Suggestions
+                  规则示例
                 </Text>
                 <View className="flex-row flex-wrap gap-2">
                   {RULE_PRESETS.map((preset) => (

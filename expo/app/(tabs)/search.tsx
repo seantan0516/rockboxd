@@ -35,14 +35,14 @@ export default function SearchScreen() {
       <RemoteServerBanner />
       <View className="px-4 pt-2 pb-4">
         <Text className="text-text-primary text-[26px] mb-4 font-display-extra">
-          Search
+          搜索
         </Text>
         <View className="flex-row items-center bg-bg-card rounded-md px-3 h-11 gap-2">
           <Ionicons name="search" size={18} color={Colors.textMuted} />
           <TextInput
             value={query}
             onChangeText={setQuery}
-            placeholder="Songs, artists, albums"
+            placeholder="歌曲、艺人、专辑"
             placeholderTextColor={Colors.textMuted}
             className="flex-1 text-text-primary text-[15px] font-sans"
             autoCorrect={false}
@@ -61,21 +61,21 @@ export default function SearchScreen() {
       </View>
 
       {!isConnected ? (
-        <NotConnectedState message="Connect to a server to search your library." />
+        <NotConnectedState message="连接服务器后即可搜索音乐资料库。" />
       ) : query.trim().length > 0 ? (
         <ScrollView contentContainerStyle={{ paddingBottom: bottomPad }}>
           {tracks.length === 0 &&
           results.albums.length === 0 &&
           results.artists.length === 0 ? (
             <Text className="text-text-secondary px-4 mt-6 font-sans">
-              No results for &ldquo;{query}&rdquo;
+              没有找到与“{query}”相关的结果
             </Text>
           ) : (
             <>
               {results.artists.length > 0 ? (
                 <View className="px-4 pt-2 pb-1">
                   <Text className="text-text-primary text-base font-display mb-1.5">
-                    Artists
+                    艺人
                   </Text>
                 </View>
               ) : null}
@@ -108,7 +108,7 @@ export default function SearchScreen() {
               {results.albums.length > 0 ? (
                 <View className="px-4 pt-3 pb-1">
                   <Text className="text-text-primary text-base font-display mb-1.5">
-                    Albums
+                    专辑
                   </Text>
                 </View>
               ) : null}
@@ -149,7 +149,7 @@ export default function SearchScreen() {
               {tracks.length > 0 ? (
                 <View className="px-4 pt-3 pb-1">
                   <Text className="text-text-primary text-base font-display mb-1.5">
-                    Songs
+                    歌曲
                   </Text>
                 </View>
               ) : null}
@@ -210,17 +210,17 @@ export default function SearchScreen() {
           showsVerticalScrollIndicator={false}
         >
           <Text className="text-text-primary text-lg mb-3 font-display">
-            Browse all
+            浏览全部
           </Text>
           {genresError ? (
             <Text className="text-danger text-sm font-sans">
-              Genres failed: {String((genresError as Error)?.message ?? genresError)}
+              音乐流派加载失败：{String((genresError as Error)?.message ?? genresError)}
             </Text>
           ) : genres.length === 0 ? (
             <Text className="text-text-secondary text-sm font-sans">
               {genresLoading
-                ? "Loading genres…"
-                : "No genres yet — wait for the daemon to finish scanning."}
+                ? "正在加载流派…"
+                : "暂无音乐流派，请等待后台扫描完成。"}
             </Text>
           ) : (
             <View className="flex-row flex-wrap gap-2">

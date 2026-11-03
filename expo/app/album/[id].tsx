@@ -66,7 +66,7 @@ export default function AlbumScreen() {
     return (
       <SafeAreaView className="flex-1 bg-bg">
         <View className="flex-1 items-center justify-center">
-          <Text className="text-text-secondary">Album not found</Text>
+          <Text className="text-text-secondary">未找到该专辑</Text>
         </View>
       </SafeAreaView>
     );
@@ -185,8 +185,7 @@ export default function AlbumScreen() {
             </Text>
           </Pressable>
           <Text className="text-text-secondary text-xs mt-1 font-sans">
-            Album{album.year ? ` • ${album.year}` : ""} • {tracks.length}{" "}
-            tracks • {totalMinutes} min
+            专辑{album.year ? ` · ${album.year}` : ""} · {tracks.length} 首歌曲 · {totalMinutes} 分钟
           </Text>
         </View>
 
@@ -272,7 +271,7 @@ export default function AlbumScreen() {
           [
             {
               icon: "play-outline",
-              label: "Play",
+              label: "播放",
               onPress: () => {
                 setMenuOpen(false);
                 playQueue(tracks);
@@ -280,7 +279,7 @@ export default function AlbumScreen() {
             },
             {
               icon: "shuffle",
-              label: "Shuffle Play",
+              label: "随机播放",
               onPress: () => {
                 setMenuOpen(false);
                 playQueue(tracks, { shuffle: true });
@@ -288,7 +287,7 @@ export default function AlbumScreen() {
             },
             {
               icon: "list-outline",
-              label: "Add to Queue",
+              label: "添加到播放队列",
               onPress: () => {
                 setMenuOpen(false);
                 tracks.forEach((t) => playLast(t));
@@ -296,12 +295,12 @@ export default function AlbumScreen() {
             },
             {
               icon: "add-circle-outline",
-              label: "Add to Playlist",
+              label: "添加到歌单",
               onPress: () => setMenuOpen(false),
             },
             {
               icon: "person-outline",
-              label: "Go to Artist",
+              label: "前往艺人页面",
               onPress: () => {
                 const ar = ARTISTS.find((a) => a.name === album.artist);
                 setMenuOpen(false);
@@ -310,7 +309,7 @@ export default function AlbumScreen() {
             },
             {
               icon: "share-outline",
-              label: "Share",
+              label: "分享",
               onPress: () => setMenuOpen(false),
             },
           ] as ActionItem[]
@@ -361,21 +360,6 @@ export default function AlbumScreen() {
   );
 }
 
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
 // ── TrackList ─────────────────────────────────────────────────────────────
 
 type TrackListProps = {
@@ -412,7 +396,7 @@ function TrackList({
                   color={Colors.textMuted}
                 />
                 <Text className="text-text-muted text-[11px] font-bold tracking-widest uppercase font-sans">
-                  Disc {disc}
+                  碟片 {disc}
                 </Text>
               </View>
             )}
@@ -470,7 +454,7 @@ function formatReleaseDate(s: string): string {
       m >= 1 &&
       m <= 12
     ) {
-      return `${d} ${MONTHS[m - 1]} ${y}`;
+      return `${y}年${m}月${d}日`;
     }
   }
   return s;

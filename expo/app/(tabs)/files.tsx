@@ -180,9 +180,9 @@ const INITIAL: BrowseState = { mode: "root", path: null, displayLabel: null, his
 function headerLabel(mode: FilesMode, _path: string | null, displayLabel: string | null): string {
   if (displayLabel) return displayLabel;
   switch (mode) {
-    case "root": return "Files";
-    case "local": return "Music";
-    case "upnp-devices": return "UPnP Devices";
+    case "root": return "文件";
+    case "local": return "本地音乐";
+    case "upnp-devices": return "UPnP 设备";
     case "upnp-browse": return "UPnP";
     case "plex-servers": return "Plex";
     case "plex-browse": return "Plex";
@@ -191,7 +191,7 @@ function headerLabel(mode: FilesMode, _path: string | null, displayLabel: string
     case "navidrome-browse": return "Navidrome";
     case "kodi-servers": return "Kodi";
     case "kodi-browse": return "Kodi";
-    default: return "Files";
+    default: return "文件";
   }
 }
 
@@ -240,9 +240,9 @@ function FileActionsSheet({ menu, onClose }: { menu: MenuEntry | null; onClose: 
   const run = (action: () => Promise<unknown>) => { action().catch(() => {}); onClose(); };
   const confirmPlay = (action: () => void) => {
     if (queue.length > 0) {
-      Alert.alert("Replace Queue", "This will clear the current queue.", [
-        { text: "Cancel", style: "cancel" },
-        { text: "Play", style: "destructive", onPress: action },
+      Alert.alert("替换播放队列", "此操作将清空当前播放队列。", [
+        { text: "取消", style: "cancel" },
+        { text: "播放", style: "destructive", onPress: action },
       ]);
     } else { action(); }
     onClose();
@@ -250,13 +250,13 @@ function FileActionsSheet({ menu, onClose }: { menu: MenuEntry | null; onClose: 
 
   type MenuItem = { icon: React.ComponentProps<typeof Ionicons>["name"]; label: string; separator?: boolean; onPress: () => void };
   const items: MenuItem[] = [
-    { icon: "play-circle-outline", label: "Play", onPress: () => confirmPlay(() => (isDir ? RockboxClient.playDirectory(entry.path, false) : RockboxClient.playDirectory(currentDir ?? entry.path, false, entryIndex)).catch(() => {})) },
-    { icon: "play-skip-forward-outline", label: "Play Next", onPress: () => run(() => isDir ? RockboxClient.insertDirectory(entry.path, INSERT_NEXT) : RockboxClient.insertTrackNext(entry.path)) },
-    { icon: "list-outline", label: "Play Last", onPress: () => run(() => isDir ? RockboxClient.insertDirectory(entry.path, INSERT_LAST) : RockboxClient.insertTrackLast(entry.path)) },
-    { icon: "shuffle-outline", label: "Add Shuffled", onPress: () => run(() => isDir ? RockboxClient.insertDirectory(entry.path, INSERT_SHUFFLED) : RockboxClient.insertTracks([entry.path], INSERT_SHUFFLED, false)) },
+    { icon: "play-circle-outline", label: "播放", onPress: () => confirmPlay(() => (isDir ? RockboxClient.playDirectory(entry.path, false) : RockboxClient.playDirectory(currentDir ?? entry.path, false, entryIndex)).catch(() => {})) },
+    { icon: "play-skip-forward-outline", label: "下一首播放", onPress: () => run(() => isDir ? RockboxClient.insertDirectory(entry.path, INSERT_NEXT) : RockboxClient.insertTrackNext(entry.path)) },
+    { icon: "list-outline", label: "添加到队列末尾", onPress: () => run(() => isDir ? RockboxClient.insertDirectory(entry.path, INSERT_LAST) : RockboxClient.insertTrackLast(entry.path)) },
+    { icon: "shuffle-outline", label: "随机添加", onPress: () => run(() => isDir ? RockboxClient.insertDirectory(entry.path, INSERT_SHUFFLED) : RockboxClient.insertTracks([entry.path], INSERT_SHUFFLED, false)) },
     ...(isDir ? ([
-      { icon: "shuffle-outline" as const, label: "Play Last Shuffled", separator: true, onPress: () => run(() => RockboxClient.insertDirectory(entry.path, INSERT_LAST_SHUFFLED)) },
-      { icon: "play-circle" as const, label: "Play Shuffled", onPress: () => confirmPlay(() => RockboxClient.playDirectory(entry.path, true).catch(() => {})) },
+      { icon: "shuffle-outline" as const, label: "随机添加到队列末尾", separator: true, onPress: () => run(() => RockboxClient.insertDirectory(entry.path, INSERT_LAST_SHUFFLED)) },
+      { icon: "play-circle" as const, label: "随机播放", onPress: () => confirmPlay(() => RockboxClient.playDirectory(entry.path, true).catch(() => {})) },
     ] as MenuItem[]) : []),
   ];
 
@@ -587,9 +587,9 @@ export default function FilesScreen() {
       const currentDir = dir ?? inferCurrentDir(entries);
       const doPlay = () => RockboxClient.playDirectory(currentDir ?? entry.path, false, index).catch(() => {});
       if (queue.length > 0) {
-        Alert.alert("Replace Queue", "This will clear the current queue.", [
-          { text: "Cancel", style: "cancel" },
-          { text: "Play", style: "destructive", onPress: doPlay },
+        Alert.alert("替换播放队列", "此操作将清空当前播放队列。", [
+          { text: "取消", style: "cancel" },
+          { text: "播放", style: "destructive", onPress: doPlay },
         ]);
       } else doPlay();
     },
@@ -656,10 +656,10 @@ export default function FilesScreen() {
         setShowJellyfinAuth(false);
         setPendingJellyfinServer(null);
       } else {
-        setJellyfinError("Authentication failed. Check username/password.");
+        setJellyfinError("身份验证失败，请检查用户名和密码。");
       }
     } catch {
-      setJellyfinError("Could not reach the Jellyfin server.");
+      setJellyfinError("无法连接到 Jellyfin 服务器。");
     } finally {
       setJellyfinSigningIn(false);
     }
@@ -678,16 +678,16 @@ export default function FilesScreen() {
       if (resp.ok) {
         const users = await resp.json();
         const userId: string = users[0]?.Id;
-        if (!userId) { setJellyfinError("No users found for this API key."); return; }
+        if (!userId) { setJellyfinError("此 API 密钥下未找到用户。"); return; }
         const navPath = `${pendingJellyfinServer}%3FX-Jellyfin-Token%3D${encodeURIComponent(jellyfinApiKey)}%26userId%3D${encodeURIComponent(userId)}`;
         navigate("jellyfin-browse", navPath, "Jellyfin");
         setShowJellyfinAuth(false);
         setPendingJellyfinServer(null);
       } else {
-        setJellyfinError("Invalid API key or insufficient permissions.");
+        setJellyfinError("API 密钥无效或权限不足。");
       }
     } catch {
-      setJellyfinError("Could not reach the Jellyfin server.");
+      setJellyfinError("无法连接到 Jellyfin 服务器。");
     } finally {
       setJellyfinSigningIn(false);
     }
@@ -716,7 +716,7 @@ export default function FilesScreen() {
       if (!resp.ok) throw new Error("HTTP " + resp.status);
       const json = await resp.json();
       if (json["subsonic-response"]?.status !== "ok") {
-        setNavidromeError("Authentication failed. Check username/password.");
+        setNavidromeError("身份验证失败，请检查用户名和密码。");
         return;
       }
       const credUrl = `${baseUrl}?nd_user=${encodeURIComponent(navidromeUsername)}&nd_token=${token}&nd_salt=${salt}`;
@@ -724,7 +724,7 @@ export default function FilesScreen() {
       setShowNavidromeEntry(false);
       setNavidromeUrl(""); setNavidromeUsername(""); setNavidromePassword("");
     } catch {
-      setNavidromeError("Could not reach the Navidrome server.");
+      setNavidromeError("无法连接到 Navidrome 服务器。");
     } finally {
       setNavidromeConnecting(false);
     }
@@ -754,11 +754,11 @@ export default function FilesScreen() {
 
   const inServerListMode = isServerListMode(browse.mode);
   const emptyMessage =
-    browse.mode === "upnp-devices" ? "No UPnP devices found" :
-    browse.mode === "plex-servers" ? "No Plex servers found" :
-    browse.mode === "jellyfin-servers" ? "No Jellyfin servers found" :
-    browse.mode === "kodi-servers" ? "No Kodi servers found" :
-    "No files here";
+    browse.mode === "upnp-devices" ? "未找到 UPnP 设备" :
+    browse.mode === "plex-servers" ? "未找到 Plex 服务器" :
+    browse.mode === "jellyfin-servers" ? "未找到 Jellyfin 服务器" :
+    browse.mode === "kodi-servers" ? "未找到 Kodi 服务器" :
+    "此处没有文件";
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
@@ -842,7 +842,7 @@ export default function FilesScreen() {
                 <View className="w-9 h-9 rounded-lg bg-bg-card items-center justify-center shrink-0">
                   <Ionicons name="add-outline" size={20} color={Colors.accent} />
                 </View>
-                <Text className="text-accent text-[14px] font-sans">Add Server Manually…</Text>
+                <Text className="text-accent text-[14px] font-sans">手动添加服务器…</Text>
               </Pressable>
             ) : null
           }
@@ -859,9 +859,9 @@ export default function FilesScreen() {
       <FileActionsSheet menu={menu} onClose={() => setMenu(null)} />
 
       {/* ── Plex: token modal ──────────────────────────────────────────────── */}
-      <ConnectModal visible={showPlexAuth} title="Plex — Enter Token" onClose={() => { setShowPlexAuth(false); setPendingPlexServer(null); }}>
+      <ConnectModal visible={showPlexAuth} title="Plex — 输入访问令牌" onClose={() => { setShowPlexAuth(false); setPendingPlexServer(null); }}>
         <Text className="text-text-muted text-[13px] font-sans -mt-1">
-          Your Plex token from plex.tv/claim or account settings.
+          请填写从 plex.tv/claim 或账户设置中获取的 Plex 令牌。
         </Text>
         <FormInput value={plexToken} onChangeText={setPlexToken} placeholder="X-Plex-Token (optional)" />
         <ConnectButton
@@ -871,7 +871,7 @@ export default function FilesScreen() {
       </ConnectModal>
 
       {/* ── Plex: manual URL modal ─────────────────────────────────────────── */}
-      <ConnectModal visible={showPlexManual} title="Plex — Server URL" onClose={() => setShowPlexManual(false)}>
+      <ConnectModal visible={showPlexManual} title="Plex — 服务器地址" onClose={() => setShowPlexManual(false)}>
         <FormInput value={plexManualUrl} onChangeText={setPlexManualUrl} placeholder="http://192.168.1.x:32400" keyboardType="url" />
         <ConnectButton label="Continue" onPress={handlePlexManualAdd} disabled={!plexManualUrl.trim()} />
       </ConnectModal>
@@ -879,7 +879,7 @@ export default function FilesScreen() {
       {/* ── Jellyfin: credentials / API key modal ──────────────────────────── */}
       <ConnectModal
         visible={showJellyfinAuth}
-        title="Jellyfin — Sign In"
+        title="Jellyfin — 登录"
         onClose={() => { setShowJellyfinAuth(false); setPendingJellyfinServer(null); setJellyfinError(null); }}
       >
         {/* Tab switcher */}
@@ -890,7 +890,7 @@ export default function FilesScreen() {
             style={{ backgroundColor: jellyfinAuthMode === "credentials" ? Colors.accent : "transparent" }}
           >
             <Text style={{ color: jellyfinAuthMode === "credentials" ? "#fff" : Colors.textMuted }} className="text-[13px] font-display-medium">
-              Username
+              用户名
             </Text>
           </Pressable>
           <Pressable
@@ -899,7 +899,7 @@ export default function FilesScreen() {
             style={{ backgroundColor: jellyfinAuthMode === "apikey" ? Colors.accent : "transparent" }}
           >
             <Text style={{ color: jellyfinAuthMode === "apikey" ? "#fff" : Colors.textMuted }} className="text-[13px] font-display-medium">
-              API Key
+              API 密钥
             </Text>
           </Pressable>
         </View>
@@ -913,7 +913,7 @@ export default function FilesScreen() {
         ) : (
           <>
             <FormInput value={jellyfinApiKey} onChangeText={setJellyfinApiKey} placeholder="API Key" />
-            <ConnectButton label="Connect" onPress={handleJellyfinApiKey} loading={jellyfinSigningIn} disabled={!jellyfinApiKey.trim()} />
+            <ConnectButton label="连接" onPress={handleJellyfinApiKey} loading={jellyfinSigningIn} disabled={!jellyfinApiKey.trim()} />
           </>
         )}
 
@@ -923,7 +923,7 @@ export default function FilesScreen() {
       </ConnectModal>
 
       {/* ── Jellyfin: manual URL modal ─────────────────────────────────────── */}
-      <ConnectModal visible={showJellyfinManual} title="Jellyfin — Server URL" onClose={() => setShowJellyfinManual(false)}>
+      <ConnectModal visible={showJellyfinManual} title="Jellyfin — 服务器地址" onClose={() => setShowJellyfinManual(false)}>
         <FormInput value={jellyfinManualUrl} onChangeText={setJellyfinManualUrl} placeholder="http://192.168.1.x:8096" keyboardType="url" />
         <ConnectButton label="Continue" onPress={handleJellyfinManualConnect} disabled={!jellyfinManualUrl.trim()} />
       </ConnectModal>
@@ -938,7 +938,7 @@ export default function FilesScreen() {
         <FormInput value={navidromeUsername} onChangeText={setNavidromeUsername} placeholder="Username" />
         <FormInput value={navidromePassword} onChangeText={setNavidromePassword} placeholder="Password" secureTextEntry />
         <ConnectButton
-          label="Connect"
+          label="连接"
           onPress={handleNavidromeConnect}
           loading={navidromeConnecting}
           disabled={!navidromeUrl.trim() || !navidromeUsername.trim()}
@@ -951,12 +951,12 @@ export default function FilesScreen() {
       {/* ── Kodi: connect modal ────────────────────────────────────────────── */}
       <ConnectModal
         visible={showKodiAuth}
-        title="Kodi — Server URL"
+        title="Kodi — 服务器地址"
         onClose={() => { setShowKodiAuth(false); setKodiError(null); }}
       >
         <FormInput value={kodiUrl} onChangeText={setKodiUrl} placeholder="http://192.168.1.x:8080" keyboardType="url" />
         <Text className="text-text-muted text-[12px] font-sans -mt-2">
-          Username and password are optional.
+          用户名和密码可不填写。
         </Text>
         <FormInput value={kodiUsername} onChangeText={setKodiUsername} placeholder="Username (optional)" />
         <FormInput value={kodiPassword} onChangeText={setKodiPassword} placeholder="Password (optional)" secureTextEntry />

@@ -47,7 +47,7 @@ export function RemoteServerBanner() {
           letterSpacing: 0.4,
         }}
       >
-        Controlling {server.label} · {server.host}
+        正在控制 {server.label} · {server.host}
       </Text>
     </Pressable>
   );

@@ -115,7 +115,7 @@ export function useCurrentDeviceLabel(): {
   const list: DeviceItem[] = Array.isArray(data) ? data : [];
   const current = list.find((d) => d.is_current_device);
   return {
-    name: current?.name ?? "This Phone",
+    name: current?.name ?? "本机",
     icon: iconFor(current?.service),
   };
 }
@@ -165,20 +165,20 @@ export function DevicePickerSheet({
         >
           <View className="self-center w-10 h-1 rounded-sm bg-border my-2" />
           <Text className="text-text-primary text-base font-bold text-center py-2 font-sans">
-            Output devices
+            输出设备
           </Text>
           <ScrollView>
             {!isConnected ? (
               <Text className="text-text-secondary text-sm text-center py-6 font-sans">
-                Connect to a server first.
+请先连接到服务器。
               </Text>
             ) : isLoading && list.length === 0 ? (
               <Text className="text-text-secondary text-sm text-center py-6 font-sans">
-                Loading devices…
+正在加载设备…
               </Text>
             ) : list.length === 0 ? (
               <Text className="text-text-secondary text-sm text-center py-6 font-sans">
-                No output devices found.
+未发现可用的输出设备。
               </Text>
             ) : (
               list.map((d, idx) => {
@@ -210,7 +210,7 @@ export function DevicePickerSheet({
                         numberOfLines={1}
                         className={`text-[14px] font-semibold font-sans ${active ? "text-accent" : "text-text-primary"}`}
                       >
-                        {d.name?.trim() || "(unnamed)"}
+                        {d.name?.trim() || "未命名设备"}
                       </Text>
                       {subtitle ? (
                         <Text

@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   FlatList,
   Modal,
   Pressable,
@@ -79,22 +80,46 @@ export default function LibraryScreen() {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    RockboxClient.rescanLibrary();
-    await qc.invalidateQueries({
-      predicate: (q) => {
-        const k = q.queryKey;
-        if (!Array.isArray(k) || k.length < 2) return false;
-        const type = k[1];
-        return (
-          type !== "status" &&
-          type !== "currentTrack" &&
-          type !== "playlist" &&
-          type !== "discoveredServers" &&
-          type !== "outputDevices"
+    try {
+      let hasAccess = true;
+      try {
+        hasAccess = RockboxClient.hasAllFilesAccess();
+      } catch {
+        hasAccess = false;
+      }
+      if (!hasAccess) {
+        Alert.alert(
+          "需要访问本地音乐",
+          "请允许 Rockbox 管理所有文件，才能扫描手机 Music 文件夹。",
+          [
+            { text: "稍后", style: "cancel" },
+            { text: "打开设置", onPress: () => RockboxClient.requestAllFilesAccess() },
+          ],
         );
-      },
-    });
-    setRefreshing(false);
+        return;
+      }
+      const result = RockboxClient.rescanLibrary();
+      if (result < 0) {
+        Alert.alert("扫描未启动", "内置播放服务尚未准备好，请稍等片刻后下拉刷新。");
+        return;
+      }
+      await qc.invalidateQueries({
+        predicate: (q) => {
+          const k = q.queryKey;
+          if (!Array.isArray(k) || k.length < 2) return false;
+          const type = k[1];
+          return (
+            type !== "status" &&
+            type !== "currentTrack" &&
+            type !== "playlist" &&
+            type !== "discoveredServers" &&
+            type !== "outputDevices"
+          );
+        },
+      });
+    } finally {
+      setRefreshing(false);
+    }
   }, [qc]);
 
   const bottomPad = useBottomSpacing(24);

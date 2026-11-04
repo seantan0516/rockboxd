@@ -528,6 +528,32 @@ export default function FilesScreen() {
 
   const handleRefresh = useCallback(() => doFetch(browse.mode, browse.path, true), [browse.mode, browse.path, doFetch]);
 
+  const handleLocalScan = useCallback(() => {
+    let hasAccess = true;
+    try {
+      hasAccess = RockboxClient.hasAllFilesAccess();
+    } catch {
+      hasAccess = false;
+    }
+    if (!hasAccess) {
+      Alert.alert(
+        "需要访问本地音乐",
+        "Android 需要允许 Rockbox 访问音乐文件。请在系统设置中开启“允许管理所有文件”，返回后再次点击扫描。",
+        [
+          { text: "取消", style: "cancel" },
+          { text: "打开设置", onPress: () => RockboxClient.requestAllFilesAccess() },
+        ],
+      );
+      return;
+    }
+    const result = RockboxClient.rescanLibrary();
+    if (result < 0) {
+      Alert.alert("暂时无法扫描", "内置播放服务尚未准备好，请稍等片刻后重试。");
+      return;
+    }
+    doFetch("local", browse.path, true);
+  }, [browse.path, doFetch]);
+
   const navigate = useCallback(
     (mode: FilesMode, path: string | null, displayLabel?: string) =>
       dispatch({ type: "push", mode, path, displayLabel }),
@@ -847,9 +873,26 @@ export default function FilesScreen() {
             ) : null
           }
           ListEmptyComponent={
-            <View className="items-center justify-center py-16">
-              <Ionicons name="server-outline" size={48} color={Colors.textMuted} />
-              <Text className="text-text-muted text-[14px] mt-3">{emptyMessage}</Text>
+            <View className="items-center justify-center py-16 px-6">
+              <Ionicons name="folder-open-outline" size={48} color={Colors.textMuted} />
+              <Text className="text-text-muted text-[14px] mt-3 text-center">
+                {browse.mode === "local" ? "没有读取到本地音乐文件" : emptyMessage}
+              </Text>
+              {browse.mode === "local" ? (
+                <>
+                  <Text className="text-text-muted text-xs text-center leading-5 mt-2">
+                    请确认手机的 Music 文件夹中有音乐文件，并允许 Rockbox 访问所有文件。
+                  </Text>
+                  <Pressable
+                    onPress={handleLocalScan}
+                    className="mt-4 px-5 py-2.5 rounded-full bg-accent"
+                  >
+                    <Text className="text-white text-sm font-semibold">
+                      授权并重新扫描
+                    </Text>
+                  </Pressable>
+                </>
+              ) : null}
             </View>
           }
         />

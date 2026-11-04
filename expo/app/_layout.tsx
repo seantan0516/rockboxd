@@ -220,13 +220,12 @@ function useAllFilesAccessPrompt() {
 
       askedThisSession.current = true;
       Alert.alert(
-        "Allow access to your music",
-        "Rockbox needs \"All files access\" to scan your Music folder. " +
-          "Tap Open Settings, toggle the switch on, then come back.",
+        "需要访问本地音乐",
+        "Rockbox 需要“管理所有文件”权限，才能扫描手机的 Music 文件夹。点击“打开设置”，开启权限后返回应用。",
         [
-          { text: "Not now", style: "cancel" },
+          { text: "暂不授权", style: "cancel" },
           {
-            text: "Open Settings",
+            text: "打开设置",
             onPress: () => {
               try {
                 RockboxClient.requestAllFilesAccess();

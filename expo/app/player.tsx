@@ -11,6 +11,7 @@ import {
   DevicePickerSheet,
   useCurrentDeviceLabel,
 } from "@/components/device-picker";
+import { RemoteServerBanner } from "@/components/remote-server-banner";
 import { SeekBar } from "@/components/seek-bar";
 import { Colors } from "@/constants/theme";
 import { formatDuration } from "@/lib/mock-data";
@@ -42,6 +43,7 @@ export default function PlayerScreen() {
   if (!currentTrack) {
     return (
       <SafeAreaView className="flex-1 bg-bg">
+        <RemoteServerBanner />
         <View className="flex-1 items-center justify-center">
           <Text className="text-text-secondary">暂无正在播放的歌曲</Text>
         </View>
@@ -55,7 +57,7 @@ export default function PlayerScreen() {
 
   const adjustVolume = (steps: number) => {
     RockboxClient.adjustVolume(steps).catch(() => {
-      Alert.alert("音量调整失败", "内置播放服务暂时无法调整音量，请稍后重试。");
+      Alert.alert("音量调整失败", "请检查服务器连接后重试。");
     });
   };
 
@@ -83,6 +85,7 @@ export default function PlayerScreen() {
         </>
       ) : null}
       <SafeAreaView className="flex-1">
+        <RemoteServerBanner />
         <View className="flex-row items-center justify-between px-5 py-3">
           <Pressable hitSlop={10} onPress={() => router.back()}>
             <Ionicons name="chevron-down" size={28} color={Colors.textPrimary} />
@@ -222,13 +225,13 @@ export default function PlayerScreen() {
           </View>
 
           <View className="flex-row items-center justify-center gap-8 mt-5">
-            <Pressable hitSlop={10} onPress={() => adjustVolume(-5)} className="flex-row items-center gap-2">
+            <Pressable hitSlop={10} onPress={() => adjustVolume(-1)} className="flex-row items-center gap-2">
               <Ionicons name="volume-low" size={20} color={Colors.textSecondary} />
-              <Text className="text-text-secondary text-xs">音量 -5</Text>
+              <Text className="text-text-secondary text-xs">音量 -</Text>
             </Pressable>
-            <Pressable hitSlop={10} onPress={() => adjustVolume(5)} className="flex-row items-center gap-2">
+            <Pressable hitSlop={10} onPress={() => adjustVolume(1)} className="flex-row items-center gap-2">
               <Ionicons name="volume-high" size={20} color={Colors.textPrimary} />
-              <Text className="text-text-primary text-xs">音量 +5</Text>
+              <Text className="text-text-primary text-xs">音量 +</Text>
             </Pressable>
           </View>
 

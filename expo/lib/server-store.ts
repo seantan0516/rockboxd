@@ -74,11 +74,26 @@ async function persist(s: ServerSelection | null) {
 
 export async function hydrateSelectedServer(): Promise<ServerSelection | null> {
   if (hydrated) return current;
-  // Android APKs are built with the embedded-daemon feature. Keep all RPC
-  // traffic on the daemon inside this app instead of asking users to select
-  // or discover a separate Rockbox server.
-  current = LOCALHOST_SERVER;
-  applyToNative(current);
+  try {
+    const raw = await AsyncStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as ServerSelection;
+      current = parsed;
+      applyToNative(parsed);
+    }
+  } catch (err) {
+    // Either AsyncStorage isn't loaded, or storage is corrupt — start clean.
+    if (__DEV__) {
+      console.warn(
+        "[server-store] hydrate skipped (AsyncStorage unavailable):",
+        err,
+      );
+    }
+  }
+  if (!current) {
+    current = LOCALHOST_SERVER;
+    applyToNative(current);
+  }
   hydrated = true;
   notify();
   return current;
@@ -89,10 +104,9 @@ export function getSelectedServer(): ServerSelection | null {
 }
 
 export async function setSelectedServer(
-  _s: ServerSelection | null,
+  s: ServerSelection | null,
 ): Promise<void> {
-  // Kept for compatibility with older screens; the Android app is local-only.
-  current = LOCALHOST_SERVER;
+  current = s ?? LOCALHOST_SERVER;
   applyToNative(current);
   await persist(current);
   notify();

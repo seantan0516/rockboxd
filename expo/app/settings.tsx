@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import {
   IconCast,
+  IconDevices,
   type Icon as TablerIcon,
 } from "@tabler/icons-react-native";
 import { router, Stack } from "expo-router";
@@ -12,7 +13,9 @@ import {
   DevicePickerSheet,
   useCurrentDeviceLabel,
 } from "@/components/device-picker";
+import { RemoteServerBanner } from "@/components/remote-server-banner";
 import { Colors } from "@/constants/theme";
+import { useSelectedServer } from "@/lib/server-store";
 import { useBottomSpacing } from "@/lib/use-bottom-spacing";
 
 type Section = {
@@ -42,6 +45,10 @@ type Row =
 
 export default function SettingsScreen() {
   const [crossfade, setCrossfade] = useState(true);
+  const selectedServer = useSelectedServer();
+  const serverLabel = selectedServer
+    ? `${selectedServer.label} (${selectedServer.host}:${selectedServer.grpcPort})`
+    : "未连接";
   const [devicePickerOpen, setDevicePickerOpen] = useState(false);
   const currentDevice = useCurrentDeviceLabel();
   const bottomPad = useBottomSpacing(24);
@@ -79,6 +86,14 @@ export default function SettingsScreen() {
         },
         {
           kind: "link",
+          label: "Rockbox 服务器",
+          icon: "server-outline",
+          tablerIcon: IconDevices,
+          value: serverLabel,
+          onPress: () => router.push("/settings/server"),
+        },
+        {
+          kind: "link",
           label: "Navidrome / Subsonic",
           icon: "musical-notes-outline",
           onPress: () => router.push("/settings/navidrome" as any),
@@ -102,6 +117,7 @@ export default function SettingsScreen() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
+        <RemoteServerBanner />
         <View className="flex-row items-center px-4 py-3 gap-3">
           <Pressable hitSlop={10} onPress={() => router.back()}>
             <Ionicons

@@ -54,7 +54,7 @@ export default function GenreScreen() {
       <SafeAreaView className="flex-1 bg-bg">
         <View className="flex-1 items-center justify-center">
           <Text className="text-text-secondary">
-            {isLoading ? "Loading…" : "Genre not found"}
+            {isLoading ? "正在加载…" : "未找到该音乐流派"}
           </Text>
         </View>
       </SafeAreaView>
@@ -108,7 +108,7 @@ export default function GenreScreen() {
         >
           <View className="px-5 pb-3">
             <Text className="text-white/80 text-xs tracking-widest uppercase font-display">
-              Genre
+              音乐流派
             </Text>
             <Text
               className="text-text-primary text-[34px] mt-1 font-display-extra"
@@ -125,8 +125,7 @@ export default function GenreScreen() {
         <View className="bg-bg pt-4">
           <View className="px-5 flex-row items-center gap-4">
             <Text className="text-text-secondary text-[13px] flex-1 font-sans">
-              {tracks.length} tracks · {albums.length} albums ·{" "}
-              {artists.length} artists
+              {tracks.length} 首歌曲 · {albums.length} 张专辑 · {artists.length} 位艺人
             </Text>
             <Pressable
               hitSlop={6}
@@ -164,7 +163,7 @@ export default function GenreScreen() {
           {topTracks.length > 0 ? (
             <View className="mt-7">
               <Text className="text-text-primary text-lg px-5 mb-2 font-display">
-                Popular tracks
+                热门歌曲
               </Text>
               {topTracks.map((t, idx) => {
                 const isCurrent = currentTrack?.id === t.id;
@@ -216,7 +215,7 @@ export default function GenreScreen() {
           ) : (
             <View className="px-5 mt-8">
               <Text className="text-text-secondary text-sm font-sans">
-                No content available in {genre.name} yet.
+                该流派（{genre.name}）暂无内容。
               </Text>
             </View>
           )}
@@ -224,7 +223,7 @@ export default function GenreScreen() {
           {albums.length > 0 ? (
             <View className="mt-8">
               <Text className="text-text-primary text-lg px-5 mb-3 font-display">
-                Albums
+                专辑
               </Text>
               <FlatList
                 horizontal
@@ -263,7 +262,7 @@ export default function GenreScreen() {
           {artists.length > 0 ? (
             <View className="mt-8">
               <Text className="text-text-primary text-lg px-5 mb-3 font-display">
-                Artists
+                艺人
               </Text>
               <FlatList
                 horizontal
@@ -291,7 +290,7 @@ export default function GenreScreen() {
                       numberOfLines={1}
                       className="text-text-secondary text-xs mt-0.5 font-sans"
                     >
-                      Artist
+                      艺人
                     </Text>
                   </Pressable>
                 )}

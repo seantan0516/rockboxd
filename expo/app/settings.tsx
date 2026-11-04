@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import {
   IconCast,
-  IconDevices,
   type Icon as TablerIcon,
 } from "@tabler/icons-react-native";
 import { router, Stack } from "expo-router";
@@ -13,9 +12,7 @@ import {
   DevicePickerSheet,
   useCurrentDeviceLabel,
 } from "@/components/device-picker";
-import { RemoteServerBanner } from "@/components/remote-server-banner";
 import { Colors } from "@/constants/theme";
-import { useSelectedServer } from "@/lib/server-store";
 import { useBottomSpacing } from "@/lib/use-bottom-spacing";
 
 type Section = {
@@ -45,52 +42,40 @@ type Row =
 
 export default function SettingsScreen() {
   const [crossfade, setCrossfade] = useState(true);
-  const selectedServer = useSelectedServer();
-  const serverLabel = selectedServer
-    ? `${selectedServer.label} (${selectedServer.host}:${selectedServer.grpcPort})`
-    : "Not connected";
   const [devicePickerOpen, setDevicePickerOpen] = useState(false);
   const currentDevice = useCurrentDeviceLabel();
   const bottomPad = useBottomSpacing(24);
 
   const sections: Section[] = [
     {
-      title: "Playback",
+      title: "播放",
       rows: [
         {
           kind: "switch",
-          label: "Crossfade",
+          label: "淡入淡出",
           icon: "swap-horizontal-outline",
           value: crossfade,
           onChange: setCrossfade,
         },
-        { kind: "link", label: "Equalizer", icon: "options-outline" },
+        { kind: "link", label: "均衡器", icon: "options-outline", onPress: () => router.push("/settings/equalizer") },
       ],
     },
     {
-      title: "Devices",
+      title: "设备",
       rows: [
         {
           kind: "link",
-          label: "Bluetooth",
+          label: "蓝牙",
           icon: "bluetooth-outline",
           onPress: () => router.push("/settings/bluetooth"),
         },
         {
           kind: "link",
-          label: "AirPlay & Cast",
+          label: "AirPlay 与投放",
           icon: "tv-outline",
           tablerIcon: IconCast,
           value: currentDevice.name,
           onPress: () => setDevicePickerOpen(true),
-        },
-        {
-          kind: "link",
-          label: "Rockbox server",
-          icon: "server-outline",
-          tablerIcon: IconDevices,
-          value: serverLabel,
-          onPress: () => router.push("/settings/server"),
         },
         {
           kind: "link",
@@ -101,11 +86,11 @@ export default function SettingsScreen() {
       ],
     },
     {
-      title: "App",
+      title: "应用",
       rows: [
         {
           kind: "link",
-          label: "About",
+          label: "关于",
           icon: "information-circle-outline",
           value: "1.0.0",
         },
@@ -117,7 +102,6 @@ export default function SettingsScreen() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
-        <RemoteServerBanner />
         <View className="flex-row items-center px-4 py-3 gap-3">
           <Pressable hitSlop={10} onPress={() => router.back()}>
             <Ionicons
@@ -127,7 +111,7 @@ export default function SettingsScreen() {
             />
           </Pressable>
           <Text className="text-text-primary text-[22px] font-display-extra">
-            Settings
+            设置
           </Text>
         </View>
 

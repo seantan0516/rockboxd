@@ -178,6 +178,7 @@ export const RockboxClient = {
   adjustVolume(steps: number) {
     return require_().adjustVolume(steps);
   },
+  setEq(config: any) { return require_().setEq(JSON.stringify(config)); },
   soundCurrent(setting: number) {
     return require_().soundCurrent(setting);
   },

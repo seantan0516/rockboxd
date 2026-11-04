@@ -194,8 +194,7 @@ export default function NdAlbumScreen() {
             </Text>
           </Pressable>
           <Text className="text-text-secondary text-xs mt-1 font-sans">
-            Album{album?.year ? ` • ${album.year}` : ""} • {songs.length}{" "}
-            {songs.length === 1 ? "track" : "tracks"}
+            专辑{album?.year ? ` · ${album.year}` : ""} · {songs.length} 首歌曲
           </Text>
         </View>
 
@@ -306,17 +305,17 @@ export default function NdAlbumScreen() {
           [
             {
               icon: "play-outline",
-              label: "Play",
+              label: "播放",
               onPress: () => { setMenuOpen(false); playQueue(tracks); },
             },
             {
               icon: "shuffle",
-              label: "Shuffle Play",
+              label: "随机播放",
               onPress: () => { setMenuOpen(false); playQueue(tracks, { shuffle: true }); },
             },
             {
               icon: "list-outline",
-              label: "Add to Queue",
+              label: "添加到播放队列",
               onPress: () => { setMenuOpen(false); tracks.forEach((t) => playLast(t)); },
             },
           ] as ActionItem[]

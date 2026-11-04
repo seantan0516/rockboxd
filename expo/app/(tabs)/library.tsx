@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   FlatList,
   Modal,
   Pressable,
@@ -52,11 +53,11 @@ import type { LibrarySection, Track } from "@/lib/types";
 type Source = "local" | "navidrome";
 
 const SECTIONS: { id: LibrarySection; label: string }[] = [
-  { id: "playlists", label: "Playlists" },
-  { id: "albums", label: "Albums" },
-  { id: "artists", label: "Artists" },
-  { id: "songs", label: "Songs" },
-  { id: "liked", label: "Liked" },
+  { id: "playlists", label: "歌单" },
+  { id: "albums", label: "专辑" },
+  { id: "artists", label: "艺人" },
+  { id: "songs", label: "歌曲" },
+  { id: "liked", label: "我喜欢的" },
 ];
 
 export default function LibraryScreen() {
@@ -79,22 +80,46 @@ export default function LibraryScreen() {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    RockboxClient.rescanLibrary();
-    await qc.invalidateQueries({
-      predicate: (q) => {
-        const k = q.queryKey;
-        if (!Array.isArray(k) || k.length < 2) return false;
-        const type = k[1];
-        return (
-          type !== "status" &&
-          type !== "currentTrack" &&
-          type !== "playlist" &&
-          type !== "discoveredServers" &&
-          type !== "outputDevices"
+    try {
+      let hasAccess = true;
+      try {
+        hasAccess = RockboxClient.hasAllFilesAccess();
+      } catch {
+        hasAccess = false;
+      }
+      if (!hasAccess) {
+        Alert.alert(
+          "需要访问本地音乐",
+          "请允许 Rockbox 管理所有文件，才能扫描手机 Music 文件夹。",
+          [
+            { text: "稍后", style: "cancel" },
+            { text: "打开设置", onPress: () => RockboxClient.requestAllFilesAccess() },
+          ],
         );
-      },
-    });
-    setRefreshing(false);
+        return;
+      }
+      const result = RockboxClient.rescanLibrary();
+      if (result < 0) {
+        Alert.alert("扫描未启动", "内置播放服务尚未准备好，请稍等片刻后下拉刷新。");
+        return;
+      }
+      await qc.invalidateQueries({
+        predicate: (q) => {
+          const k = q.queryKey;
+          if (!Array.isArray(k) || k.length < 2) return false;
+          const type = k[1];
+          return (
+            type !== "status" &&
+            type !== "currentTrack" &&
+            type !== "playlist" &&
+            type !== "discoveredServers" &&
+            type !== "outputDevices"
+          );
+        },
+      });
+    } finally {
+      setRefreshing(false);
+    }
   }, [qc]);
 
   const bottomPad = useBottomSpacing(24);
@@ -200,7 +225,7 @@ export default function LibraryScreen() {
       <RemoteServerBanner />
       <View className="px-4 pt-2 pb-3 flex-row items-center justify-between">
         <Text className="text-text-primary text-[26px] font-display-extra">
-          Your Library
+          资料库
         </Text>
         <View className="flex-row gap-3">
           <Pressable
@@ -232,7 +257,7 @@ export default function LibraryScreen() {
               autoFocus
               value={searchQuery}
               onChangeText={setSearchQuery}
-              placeholder="Search in library"
+              placeholder="搜索资料库"
               placeholderTextColor={Colors.textMuted}
               className="flex-1 text-text-primary text-sm font-sans"
             />
@@ -257,7 +282,7 @@ export default function LibraryScreen() {
                 className={`h-7 px-3.5 rounded-full items-center justify-center ${active ? "bg-accent" : "bg-bg-card"}`}
               >
                 <Text className={`text-[12px] font-sans ${active ? "text-white font-semibold" : "text-text-secondary font-medium"}`}>
-                  {src === "local" ? "Local" : ndServer.label || "Navidrome"}
+                  {src === "local" ? "本地" : ndServer.label || "Navidrome"}
                 </Text>
               </Pressable>
             );
@@ -339,7 +364,7 @@ export default function LibraryScreen() {
                   {item.name}
                 </Text>
                 <Text numberOfLines={1} className="text-text-secondary text-[13px] mt-0.5 font-sans">
-                  {item.isSmart ? "Smart playlist" : "Playlist"}
+                  {item.isSmart ? "智能歌单" : "歌单"}
                   {item.trackCount > 0 ? ` • ${item.trackCount} tracks` : ""}
                 </Text>
               </View>
@@ -433,7 +458,7 @@ export default function LibraryScreen() {
               )}
               <View className="flex-1">
                 <Text className="text-text-primary text-[15px] font-semibold font-sans">{item.name}</Text>
-                <Text className="text-text-secondary text-[13px] mt-0.5 font-sans">Artist</Text>
+                <Text className="text-text-secondary text-[13px] mt-0.5 font-sans">艺人</Text>
               </View>
             </Pressable>
           )}
@@ -453,7 +478,7 @@ export default function LibraryScreen() {
                   <Ionicons name="heart" size={36} color="#FFFFFF" />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-text-primary text-[22px] font-display-extra">Liked Songs</Text>
+                  <Text className="text-text-primary text-[22px] font-display-extra">我喜欢的歌曲</Text>
                   <Text className="text-text-secondary text-[13px] mt-1 font-sans">{likedTracks.length} liked tracks</Text>
                 </View>
               </View>
@@ -468,7 +493,7 @@ export default function LibraryScreen() {
               </View>
             </View>
           }
-          ListEmptyComponent={<Text className="text-text-secondary px-4 font-sans">No liked songs yet. Tap the heart on any track.</Text>}
+          ListEmptyComponent={<Text className="text-text-secondary px-4 font-sans">还没有喜欢的歌曲，点击歌曲旁边的爱心即可收藏。</Text>}
           contentContainerStyle={{ paddingBottom: bottomPad }}
           renderItem={({ item }) => {
             const isCurrent = currentTrack?.id === item.id && !!item.id;
@@ -498,10 +523,10 @@ export default function LibraryScreen() {
         <Pressable className="flex-1 bg-black/60" onPress={() => setCreateOpen(false)}>
           <Pressable onPress={(e) => e.stopPropagation()} className="mt-auto bg-bg-elevated rounded-t-2xl pt-2 pb-7">
             <View className="self-center w-10 h-1 rounded-sm bg-border my-2" />
-            <Text className="text-text-primary text-base font-bold text-center py-2 font-sans">Create new</Text>
+            <Text className="text-text-primary text-base font-bold text-center py-2 font-sans">新建</Text>
             {[
-              { icon: "musical-notes-outline", label: "Playlist", desc: "Build a custom mix", href: "/playlist/new" },
-              { icon: "list-outline", label: "Smart playlist", desc: "Auto-updates from rules", href: "/playlist/new?mode=smart" },
+              { icon: "musical-notes-outline", label: "歌单", desc: "创建自定义歌单", href: "/playlist/new" },
+              { icon: "list-outline", label: "智能歌单", desc: "根据规则自动更新", href: "/playlist/new?mode=smart" },
             ].map((item) => (
               <Pressable
                 key={item.label}
@@ -604,10 +629,10 @@ function NdSectionContent({
       <View className="flex-1 px-4 py-8 items-center gap-3">
         <Ionicons name="musical-notes-outline" size={40} color={Colors.textMuted} />
         <Text className="text-text-secondary text-[14px] font-sans text-center">
-          Connect a Navidrome server in Settings → Navidrome / Subsonic
+          请先在“设置 → Navidrome / Subsonic”中连接服务器。
         </Text>
         <Pressable onPress={() => router.push("/settings/navidrome" as any)} className="mt-2 px-4 py-2 rounded-full bg-accent active:opacity-80">
-          <Text className="text-white text-[13px] font-display">Connect</Text>
+          <Text className="text-white text-[13px] font-display">连接</Text>
         </Pressable>
       </View>
     );
@@ -794,7 +819,7 @@ function NdSectionContent({
                 <Ionicons name="heart" size={36} color="#FFFFFF" />
               </View>
               <View className="flex-1">
-                <Text className="text-text-primary text-[22px] font-display-extra">Liked Songs</Text>
+                <Text className="text-text-primary text-[22px] font-display-extra">我喜欢的歌曲</Text>
                 <Text className="text-text-secondary text-[13px] mt-1 font-sans">{ndStarred.length} liked tracks</Text>
               </View>
             </View>
@@ -812,7 +837,7 @@ function NdSectionContent({
         contentContainerStyle={{ paddingBottom: bottomPad }}
         ListEmptyComponent={
           ndStarredLoading ? null : (
-            <Text className="text-text-secondary px-4 font-sans">No liked songs yet.</Text>
+            <Text className="text-text-secondary px-4 font-sans">还没有喜欢的歌曲。</Text>
           )
         }
         renderItem={({ item, index }) => {
@@ -886,7 +911,7 @@ function NdSectionContent({
             <View className="flex-1">
               <Text numberOfLines={1} className="text-text-primary text-[15px] font-semibold font-sans">{item.name}</Text>
               <Text numberOfLines={1} className="text-text-secondary text-[13px] mt-0.5 font-sans">
-                Playlist{item.songCount > 0 ? ` • ${item.songCount} tracks` : ""}
+                歌单{item.songCount > 0 ? ` • ${item.songCount} 首歌曲` : ""}
               </Text>
             </View>
           </Pressable>

@@ -390,6 +390,10 @@ bridge_json_int!(
 );
 
 // ── Settings ────────────────────────────────────────────────────────────────
+bridge_unit_str!(
+    Java_expo_modules_rockboxrpc_RockboxRpcModule_rb_1set_1eq_1json,
+    rb_set_eq_json
+);
 
 bridge_unit_int!(
     Java_expo_modules_rockboxrpc_RockboxRpcModule_rb_1save_1shuffle,

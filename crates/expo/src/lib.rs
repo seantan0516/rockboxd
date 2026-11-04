@@ -23,7 +23,7 @@ use std::time::Duration;
 use futures_util::pin_mut;
 use futures_util::StreamExt;
 use once_cell::sync::Lazy;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tokio::runtime::Runtime;
 use tokio::sync::mpsc;
 use tokio::task::AbortHandle;
@@ -53,20 +53,21 @@ use api::v1alpha1::{
     sound_service_client::SoundServiceClient, system_service_client::SystemServiceClient,
     AddTracksToSavedPlaylistRequest, AdjustVolumeRequest, ConnectBluetoothDeviceRequest,
     CreateSavedPlaylistRequest, CurrentTrackRequest, DeleteSavedPlaylistRequest,
-    DisconnectBluetoothDeviceRequest, FastForwardRewindRequest, GetAlbumRequest, GetAlbumsRequest,
-    GetArtistRequest, GetArtistsRequest, GetBluetoothDevicesRequest, GetCurrentRequest,
-    GetGenreAlbumsRequest, GetGenreArtistsRequest, GetGenreRequest, GetGenreTracksRequest,
-    GetGenresRequest, GetGlobalSettingsRequest, GetGlobalStatusRequest, GetLikedAlbumsRequest,
-    GetLikedTracksRequest, GetSavedPlaylistTracksRequest, GetSavedPlaylistsRequest,
-    GetSmartPlaylistTracksRequest, GetSmartPlaylistsRequest, GetTracksRequest,
-    InsertDirectoryRequest, InsertTracksRequest, LikeTrackRequest, NextRequest, PauseRequest,
-    PlayAlbumRequest, PlayAllTracksRequest, PlayArtistTracksRequest, PlayDirectoryRequest,
-    PlayOrPauseRequest, PlaySavedPlaylistRequest, PlaySmartPlaylistRequest, PlayTrackRequest,
-    PlaylistResumeRequest, PreviousRequest, RemoveTrackFromSavedPlaylistRequest,
-    RemoveTracksRequest, ResumeRequest, ResumeTrackRequest, SaveSettingsRequest,
-    ScanBluetoothRequest, SearchRequest, ShufflePlaylistRequest, SoundCurrentRequest, StartRequest,
-    StatusRequest, StreamCurrentTrackRequest, StreamLibraryRequest, StreamPlaylistRequest,
-    StreamStatusRequest, TreeGetEntriesRequest, UnlikeTrackRequest, UpdateSavedPlaylistRequest,
+    DisconnectBluetoothDeviceRequest, EqBandSettingMessage, FastForwardRewindRequest,
+    GetAlbumRequest, GetAlbumsRequest, GetArtistRequest, GetArtistsRequest,
+    GetBluetoothDevicesRequest, GetCurrentRequest, GetGenreAlbumsRequest, GetGenreArtistsRequest,
+    GetGenreRequest, GetGenreTracksRequest, GetGenresRequest, GetGlobalSettingsRequest,
+    GetGlobalStatusRequest, GetLikedAlbumsRequest, GetLikedTracksRequest,
+    GetSavedPlaylistTracksRequest, GetSavedPlaylistsRequest, GetSmartPlaylistTracksRequest,
+    GetSmartPlaylistsRequest, GetTracksRequest, InsertDirectoryRequest, InsertTracksRequest,
+    LikeTrackRequest, NextRequest, PauseRequest, PlayAlbumRequest, PlayAllTracksRequest,
+    PlayArtistTracksRequest, PlayDirectoryRequest, PlayOrPauseRequest, PlaySavedPlaylistRequest,
+    PlaySmartPlaylistRequest, PlayTrackRequest, PlaylistResumeRequest, PreviousRequest,
+    RemoveTrackFromSavedPlaylistRequest, RemoveTracksRequest, ResumeRequest, ResumeTrackRequest,
+    SaveSettingsRequest, ScanBluetoothRequest, SearchRequest, SetEqRequest, ShufflePlaylistRequest,
+    SoundCurrentRequest, StartRequest, StatusRequest, StreamCurrentTrackRequest,
+    StreamLibraryRequest, StreamPlaylistRequest, StreamStatusRequest, TreeGetEntriesRequest,
+    UnlikeTrackRequest, UpdateSavedPlaylistRequest,
 };
 
 // ── Globals ──────────────────────────────────────────────────────────────────
@@ -838,6 +839,110 @@ pub extern "C" fn rb_sound_current_json(setting: c_int) -> *mut c_char {
         connect_err(c.sound_current(SoundCurrentRequest { setting })).await
     });
     unwrap_or_err_string(res.map(|r| r.into_inner()))
+}
+
+#[derive(Deserialize)]
+struct EqConfigJson {
+    enabled: bool,
+    precut: i32,
+    bands: Vec<EqBandJson>,
+}
+
+#[derive(Deserialize)]
+struct EqBandJson {
+    cutoff: i32,
+    q: i32,
+    gain: i32,
+}
+
+const EQ_PRESET_BAND_COUNT: usize = 5;
+const ROCKBOX_EQ_BAND_COUNT: usize = 10;
+
+fn complete_eq_bands(bands: Vec<EqBandJson>) -> Vec<EqBandSettingMessage> {
+    let mut bands: Vec<EqBandSettingMessage> = bands
+        .into_iter()
+        .map(|band| EqBandSettingMessage {
+            cutoff: band.cutoff,
+            q: band.q,
+            gain: band.gain,
+        })
+        .collect();
+    bands.extend(
+        (bands.len()..ROCKBOX_EQ_BAND_COUNT).map(|_| EqBandSettingMessage {
+            cutoff: 1000,
+            q: 10,
+            gain: 0,
+        }),
+    );
+    bands
+}
+
+#[cfg(test)]
+mod eq_preset_tests {
+    use super::*;
+
+    #[test]
+    fn five_band_presets_clear_the_remaining_rockbox_bands() {
+        let bands = complete_eq_bands(vec![
+            EqBandJson {
+                cutoff: 60,
+                q: 7,
+                gain: 35,
+            },
+            EqBandJson {
+                cutoff: 200,
+                q: 10,
+                gain: 45,
+            },
+            EqBandJson {
+                cutoff: 800,
+                q: 10,
+                gain: 5,
+            },
+            EqBandJson {
+                cutoff: 4000,
+                q: 10,
+                gain: 25,
+            },
+            EqBandJson {
+                cutoff: 12000,
+                q: 7,
+                gain: 30,
+            },
+        ]);
+
+        assert_eq!(bands.len(), ROCKBOX_EQ_BAND_COUNT);
+        assert_eq!((bands[0].cutoff, bands[0].q, bands[0].gain), (60, 7, 35));
+        assert_eq!((bands[4].cutoff, bands[4].q, bands[4].gain), (12000, 7, 30));
+        assert!(bands[EQ_PRESET_BAND_COUNT..]
+            .iter()
+            .all(|band| band.gain == 0));
+    }
+}
+
+/// Apply Rockbox-native EQ values. The cfg values are passed through unchanged.
+#[no_mangle]
+pub unsafe extern "C" fn rb_set_eq_json(config_ptr: *const c_char) -> c_int {
+    let Some(raw) = cstr_to_str(config_ptr) else {
+        return -22;
+    };
+    let Ok(config) = serde_json::from_str::<EqConfigJson>(raw) else {
+        return -22;
+    };
+    if config.bands.len() != EQ_PRESET_BAND_COUNT {
+        return -22;
+    }
+    run_unit(async move {
+        let mut c = SoundServiceClient::new(timed_endpoint(&url()).connect_lazy());
+        let bands = complete_eq_bands(config.bands);
+        c.set_eq(SetEqRequest {
+            enabled: config.enabled,
+            precut: config.precut,
+            bands,
+        })
+        .await?;
+        Ok(())
+    })
 }
 
 // ── Settings ────────────────────────────────────────────────────────────────

@@ -67,7 +67,7 @@ export default function BluetoothScreen() {
           <Ionicons name="chevron-back" size={26} color={Colors.textPrimary} />
         </Pressable>
         <Text className="flex-1 text-text-primary text-[18px] font-display-extra">
-          Bluetooth
+          蓝牙
         </Text>
         {available.data === true && isConnected ? (
           <Pressable
@@ -82,7 +82,7 @@ export default function BluetoothScreen() {
               color={Colors.textPrimary}
             />
             <Text className="text-text-primary text-xs font-display">
-              {scanMut.isPending ? "Scanning…" : "Scan"}
+              {scanMut.isPending ? "正在扫描…" : "扫描"}
             </Text>
           </Pressable>
         ) : null}
@@ -105,29 +105,29 @@ export default function BluetoothScreen() {
         {!isConnected ? (
           <Banner
             icon="server-outline"
-            text="Connect to a rockbox server first to manage Bluetooth devices."
+            text="请先连接 Rockbox 服务器，再管理蓝牙设备。"
           />
         ) : available.isLoading ? (
-          <Banner icon="bluetooth-outline" text="Checking Bluetooth…" />
+          <Banner icon="bluetooth-outline" text="正在检查蓝牙…" />
         ) : available.data === false ? (
           <Banner
             icon="alert-circle-outline"
-            text="Bluetooth isn't available on this server."
+            text="此服务器不支持蓝牙功能。"
           />
         ) : null}
 
         {isConnected && available.data === true ? (
           <View className="mt-4 px-4">
             <Text className="text-text-secondary text-xs font-bold uppercase tracking-widest mb-2 font-sans">
-              Devices
+              设备
             </Text>
             <View className="bg-bg-card rounded-xl overflow-hidden">
               {list.isLoading && devices.length === 0 ? (
-                <Banner icon="bluetooth-outline" text="Scanning…" />
+                <Banner icon="bluetooth-outline" text="正在扫描…" />
               ) : devices.length === 0 ? (
                 <Banner
                   icon="bluetooth-outline"
-                  text="No Bluetooth devices found."
+                  text="未发现蓝牙设备。"
                 />
               ) : (
                 devices.map((d, idx) => {
@@ -161,14 +161,14 @@ export default function BluetoothScreen() {
                             numberOfLines={1}
                             className="text-text-primary text-[14px] font-semibold font-sans"
                           >
-                            {d.name?.trim() || "(unnamed device)"}
+                            {d.name?.trim() || "（未命名设备）"}
                           </Text>
                           <Text
                             numberOfLines={1}
                             className="text-text-secondary text-[12px] mt-0.5 font-mono"
                           >
                             {d.address ?? "—"}
-                            {d.paired ? "  •  paired" : ""}
+                            {d.paired ? "  •  已配对" : ""}
                             {typeof d.rssi === "number"
                               ? `  •  ${d.rssi} dBm`
                               : ""}
@@ -177,7 +177,7 @@ export default function BluetoothScreen() {
                         <Text
                           className={`text-xs font-bold uppercase font-sans ${isOn ? "text-accent" : "text-text-muted"}`}
                         >
-                          {isOn ? "Connected" : "Connect"}
+                          {isOn ? "已连接" : "连接"}
                         </Text>
                       </Pressable>
                     </View>

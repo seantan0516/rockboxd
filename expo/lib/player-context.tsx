@@ -261,27 +261,32 @@ function useRealPlayer(slice: SharedSlice): PlayerContextValue {
     return () => clearInterval(id);
   }, [enabled, isPlaying, durationSecs]);
 
-  // Map proto data → app Track / Track[]
-  const currentTrack: Track | undefined = useMemo(() => {
-    if (!trackQ.data) return undefined;
-    const t = trackFromProto({
-      id: trackQ.data.id,
-      path: trackQ.data.path,
-      title: trackQ.data.title,
-      artist: trackQ.data.artist,
-      artist_id: trackQ.data.artist_id,
-      album: trackQ.data.album,
-      album_id: trackQ.data.album_id,
-      album_art: trackQ.data.album_art ?? undefined,
-      length: trackQ.data.length ?? trackQ.data.duration_ms ?? 0,
-    });
-    return t.id || t.title ? t : undefined;
-  }, [trackQ.data]);
-
+  // Map proto data → app Track / Track[]. Prefer the direct current-track
+  // snapshot, but fall back to the queue item if that RPC is temporarily empty.
   const queue: Track[] = useMemo(() => {
     return (queueQ.data?.tracks ?? []).map((p) => trackFromProto(p));
   }, [queueQ.data]);
-  const currentIdx = Math.max(0, queueQ.data?.index ?? 0);
+  const currentIdx = Math.min(
+    Math.max(0, queueQ.data?.index ?? 0),
+    Math.max(0, queue.length - 1),
+  );
+  const currentTrack: Track | undefined = useMemo(() => {
+    if (trackQ.data) {
+      const t = trackFromProto({
+        id: trackQ.data.id,
+        path: trackQ.data.path,
+        title: trackQ.data.title,
+        artist: trackQ.data.artist,
+        artist_id: trackQ.data.artist_id,
+        album: trackQ.data.album,
+        album_id: trackQ.data.album_id,
+        album_art: trackQ.data.album_art ?? undefined,
+        length: trackQ.data.length ?? trackQ.data.duration_ms ?? 0,
+      });
+      if (t.id || t.title) return t;
+    }
+    return queue[currentIdx];
+  }, [trackQ.data, queue, currentIdx]);
 
   // Settings (shuffle / repeat)
   const shuffle = settingsQ.data?.playlist_shuffle === true;

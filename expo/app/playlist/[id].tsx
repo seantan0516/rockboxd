@@ -152,9 +152,9 @@ export default function PlaylistScreen() {
           ) : null}
           <Text className="text-text-muted text-xs mt-2 font-sans">
             {[
-              playlist.isSmart ? "Smart playlist" : "Playlist",
-              tracks.length > 0 ? `${tracks.length} tracks` : null,
-              tracks.length > 0 ? `${totalMinutes} min` : null,
+              playlist.isSmart ? "智能歌单" : "歌单",
+              tracks.length > 0 ? `${tracks.length} 首歌曲` : null,
+              tracks.length > 0 ? `${totalMinutes} 分钟` : null,
             ]
               .filter(Boolean)
               .join(" • ")}
@@ -270,14 +270,14 @@ export default function PlaylistScreen() {
         onClose={() => setMenuOpen(false)}
         header={{
           title: playlist.name,
-          subtitle: playlist.isSmart ? "Smart playlist" : "Playlist",
+          subtitle: playlist.isSmart ? "智能歌单" : "歌单",
           image: playlist.artwork,
         }}
         actions={
           [
             {
               icon: "play-outline",
-              label: "Play",
+              label: "播放",
               onPress: () => {
                 setMenuOpen(false);
                 playQueue(tracks);
@@ -286,7 +286,7 @@ export default function PlaylistScreen() {
             },
             {
               icon: "shuffle",
-              label: "Shuffle Play",
+              label: "随机播放",
               onPress: () => {
                 setMenuOpen(false);
                 playQueue(tracks, { shuffle: true });
@@ -295,7 +295,7 @@ export default function PlaylistScreen() {
             },
             {
               icon: "list-outline",
-              label: "Add to Queue",
+              label: "添加到播放队列",
               onPress: () => {
                 setMenuOpen(false);
                 tracks.forEach((t) => playLast(t));
@@ -306,12 +306,12 @@ export default function PlaylistScreen() {
               ? [
                   {
                     icon: "create-outline",
-                    label: "Edit details",
+                    label: "编辑详情",
                     onPress: () => setMenuOpen(false),
                   },
                   {
                     icon: "trash-outline",
-                    label: "Delete playlist",
+                    label: "删除歌单",
                     destructive: true,
                     onPress: () => setMenuOpen(false),
                   },
@@ -319,7 +319,7 @@ export default function PlaylistScreen() {
               : []),
             {
               icon: "share-outline",
-              label: "Share",
+              label: "分享",
               onPress: () => setMenuOpen(false),
             },
           ] as ActionItem[]

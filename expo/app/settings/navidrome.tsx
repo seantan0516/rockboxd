@@ -40,14 +40,14 @@ export default function NavidromeSettingsScreen() {
     const trimUrl = url.trim().replace(/\/$/, "");
     const trimUser = user.trim();
     if (!trimUrl || !trimUser || !pass) {
-      setError("URL, username and password are required.");
+      setError("请输入服务器地址、用户名和密码。");
       return;
     }
     setConnecting(true);
     setError(null);
     const ok = await ndPing(trimUrl, trimUser, pass);
     if (!ok) {
-      setError("Could not connect. Check the URL and credentials.");
+      setError("连接失败，请检查服务器地址和登录信息。");
       setConnecting(false);
       return;
     }
@@ -61,12 +61,12 @@ export default function NavidromeSettingsScreen() {
 
   const onDelete = (id: string, label: string) => {
     Alert.alert(
-      "Remove server",
-      `Remove "${label}"?`,
+      "删除服务器",
+      `确定删除“${label}”吗？`,
       [
-        { text: "Cancel", style: "cancel" },
+        { text: "取消", style: "cancel" },
         {
-          text: "Remove",
+          text: "删除",
           style: "destructive",
           onPress: () => ndRemoveServer(id),
         },
@@ -97,7 +97,7 @@ export default function NavidromeSettingsScreen() {
           {servers.length > 0 && (
             <View className="mt-4 px-4">
               <Text className="text-text-secondary text-xs font-bold uppercase tracking-widest mb-2 font-sans">
-                Connected servers
+                已连接的服务器
               </Text>
               <View className="bg-bg-card rounded-xl overflow-hidden">
                 {servers.map((s, idx) => {
@@ -150,13 +150,13 @@ export default function NavidromeSettingsScreen() {
           {/* Add server form */}
           <View className="mt-6 px-4">
             <Text className="text-text-secondary text-xs font-bold uppercase tracking-widest mb-2 font-sans">
-              Add server
+              添加服务器
             </Text>
             <View className="bg-bg-card rounded-xl px-4 py-3 gap-2.5">
               <TextInput
                 value={url}
                 onChangeText={setUrl}
-                placeholder="Server URL (e.g. http://192.168.1.10:4533)"
+                placeholder="服务器地址（例如 http://192.168.1.10:4533）"
                 placeholderTextColor={Colors.textMuted}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -167,7 +167,7 @@ export default function NavidromeSettingsScreen() {
               <TextInput
                 value={user}
                 onChangeText={setUser}
-                placeholder="Username"
+                placeholder="用户名"
                 placeholderTextColor={Colors.textMuted}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -177,7 +177,7 @@ export default function NavidromeSettingsScreen() {
               <TextInput
                 value={pass}
                 onChangeText={setPass}
-                placeholder="Password"
+                placeholder="密码"
                 placeholderTextColor={Colors.textMuted}
                 secureTextEntry
                 className="text-text-primary text-[14px] font-sans"
@@ -200,7 +200,7 @@ export default function NavidromeSettingsScreen() {
                   <ActivityIndicator size="small" color="#FFFFFF" />
                 )}
                 <Text className="text-white text-[13px] font-display">
-                  {connecting ? "Connecting…" : "Connect"}
+                  {connecting ? "正在连接…" : "连接"}
                 </Text>
               </Pressable>
             </View>
@@ -208,8 +208,7 @@ export default function NavidromeSettingsScreen() {
 
           <View className="mt-6 px-4">
             <Text className="text-text-secondary text-[13px] font-sans leading-5">
-              Connect to a Navidrome or any Subsonic-compatible server. Your password is stored
-              locally on this device only and is used to compute auth tokens for each API request.
+              可连接 Navidrome 或任何兼容 Subsonic 协议的服务器。密码仅保存在本设备上，用于为每次 API 请求计算身份验证令牌。
             </Text>
           </View>
         </ScrollView>

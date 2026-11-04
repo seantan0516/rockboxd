@@ -30,6 +30,8 @@ impl SoundService for Sound {
             .json(&body)
             .send()
             .await
+            .map_err(|e| tonic::Status::internal(e.to_string()))?
+            .error_for_status()
             .map_err(|e| tonic::Status::internal(e.to_string()))?;
 
         Ok(tonic::Response::new(AdjustVolumeResponse::default()))
@@ -155,6 +157,8 @@ impl SoundService for Sound {
             .json(&body)
             .send()
             .await
+            .map_err(|e| tonic::Status::internal(e.to_string()))?
+            .error_for_status()
             .map_err(|e| tonic::Status::internal(e.to_string()))?;
         Ok(tonic::Response::new(SetEqResponse::default()))
     }

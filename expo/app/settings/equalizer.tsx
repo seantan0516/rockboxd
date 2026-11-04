@@ -18,19 +18,19 @@ export default function EqualizerScreen() {
   const applyPreset = async (item: (typeof EQ_PRESETS)[number]) => {
     if (applying) return;
     if (!connected) {
-      Alert.alert("尚未连接服务器", "请先连接 Rockbox 服务器，再应用均衡器预设。");
+      Alert.alert("播放服务未就绪", "内置播放服务尚未准备好，请稍后重试。");
       return;
     }
 
-    setSelected(item.id);
     setApplying(true);
     setApplyMessage("正在应用「" + item.name + "」…");
     try {
       await RockboxClient.setEq({ enabled: item.enabled, precut: item.precut, bands: item.bands });
-      setApplyMessage("已应用：" + item.name);
+      setSelected(item.id);
+      setApplyMessage("已写入播放 DSP：" + item.name);
     } catch {
-      setApplyMessage("应用失败，请检查服务器连接后重试");
-      Alert.alert("应用失败", "服务器未能应用「" + item.name + "」均衡器预设，请检查连接后重试。");
+      setApplyMessage("写入失败，请检查内置播放服务状态后重试");
+      Alert.alert("均衡器应用失败", "播放端没有确认写入「" + item.name + "」预设，请稍后重试。");
     } finally {
       setApplying(false);
     }

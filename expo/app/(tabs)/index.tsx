@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { IconCast, IconDevices } from "@tabler/icons-react-native";
+import { IconCast } from "@tabler/icons-react-native";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useCallback, useMemo, useState } from "react";
@@ -8,7 +8,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ArtistPlaceholder } from "@/components/artist-placeholder";
 import { CardRow } from "@/components/card-row";
-import { RemoteServerBanner } from "@/components/remote-server-banner";
 import { DevicePickerSheet } from "@/components/device-picker";
 import { NotConnectedState } from "@/components/empty-state";
 import { PlaylistCover } from "@/components/playlist-cover";
@@ -63,7 +62,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
-      <RemoteServerBanner />
       <ScrollView
         contentContainerStyle={{ paddingBottom: bottomPad }}
         showsVerticalScrollIndicator={false}
@@ -83,15 +81,11 @@ export default function HomeScreen() {
           <View className="flex-row items-center gap-2">
             <Pressable
               hitSlop={8}
-              onPress={() => router.push("/settings/server")}
-              accessibilityLabel="Rockbox 服务器"
+              onPress={() => router.push("/player")}
+              accessibilityLabel="正在播放"
               className="w-9 h-9 rounded-full bg-bg-card items-center justify-center"
             >
-              <IconDevices
-                size={20}
-                color={Colors.textPrimary}
-                strokeWidth={1.75}
-              />
+              <Ionicons name="play-circle-outline" size={22} color={Colors.textPrimary} />
             </Pressable>
             <Pressable
               hitSlop={8}

@@ -1,16 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
 
 /**
- * Standard empty-state for screens that need a connected server but don't
- * have one. Shows an icon, a short message, and a "选择服务器" CTA.
+ * Empty state shown when the embedded playback service is unavailable.
  */
 export function NotConnectedState({
-  message = "连接 Rockbox 服务器以查看音乐资料库。",
-  icon = "server-outline",
+  message = "内置播放服务尚未就绪，请稍后重试；如果持续出现，请重新安装包含内置播放服务的版本。",
+  icon = "alert-circle-outline",
 }: {
   message?: string;
   icon?: React.ComponentProps<typeof Ionicons>["name"];
@@ -21,14 +19,6 @@ export function NotConnectedState({
       <Text className="text-text-secondary text-[14px] text-center mt-4 font-sans">
         {message}
       </Text>
-      <Pressable
-        onPress={() => router.push("/settings/server")}
-        className="mt-5 px-4 py-2 rounded-full bg-accent active:opacity-80"
-      >
-        <Text className="text-white text-[13px] font-bold font-sans">
-          选择服务器
-        </Text>
-      </Pressable>
     </View>
   );
 }

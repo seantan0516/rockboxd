@@ -19,7 +19,7 @@ import { useFocusEffect } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { NotConnectedState } from "@/components/empty-state";
-import { RemoteServerBanner } from "@/components/remote-server-banner";
+import { UpnpDevicePickerSheet } from "@/components/upnp-device-picker";
 import { useIsConnected } from "@/lib/connection";
 import { useBottomSpacing } from "@/lib/use-bottom-spacing";
 import { Colors } from "@/constants/theme";
@@ -441,6 +441,7 @@ export default function FilesScreen() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [menu, setMenu] = useState<MenuEntry | null>(null);
+  const [upnpPickerOpen, setUpnpPickerOpen] = useState(false);
   const bottomPad = useBottomSpacing(16);
   const isConnected = useIsConnected();
   const { queue } = usePlayer();
@@ -762,7 +763,6 @@ export default function FilesScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
-      <RemoteServerBanner />
 
       {/* Header */}
       <View className="flex-row items-center px-4 pt-2 pb-3 gap-3">
@@ -781,7 +781,7 @@ export default function FilesScreen() {
         <View className="gap-3 px-4 pt-2">
           <View className="flex-row gap-3">
             <RootTile icon={<Ionicons name="folder-open-outline" size={32} color={Colors.textMuted} />} label="Music" onPress={() => navigate("local", null)} />
-            <RootTile icon={<Ionicons name="laptop-outline" size={32} color={Colors.textMuted} />} label="UPnP" onPress={() => navigate("upnp-devices", null)} />
+            <RootTile icon={<Ionicons name="laptop-outline" size={32} color={Colors.textMuted} />} label="DLNA" onPress={() => setUpnpPickerOpen(true)} />
           </View>
           <View className="flex-row gap-3">
             <RootTile icon={<PlexIcon size={32} />} label="Plex" onPress={() => navigate("plex-servers", null)} />
@@ -857,6 +857,14 @@ export default function FilesScreen() {
 
       {/* Context menu */}
       <FileActionsSheet menu={menu} onClose={() => setMenu(null)} />
+      <UpnpDevicePickerSheet
+        visible={upnpPickerOpen}
+        onClose={() => setUpnpPickerOpen(false)}
+        onSelect={(device) => {
+          setUpnpPickerOpen(false);
+          navigate("upnp-browse", device.path, device.name);
+        }}
+      />
 
       {/* ── Plex: token modal ──────────────────────────────────────────────── */}
       <ConnectModal visible={showPlexAuth} title="Plex — 输入访问令牌" onClose={() => { setShowPlexAuth(false); setPendingPlexServer(null); }}>

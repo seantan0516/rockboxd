@@ -147,10 +147,6 @@ export default function RootLayout() {
             options={{ animation: "slide_from_right" }}
           />
           <Stack.Screen
-            name="settings/server"
-            options={{ animation: "slide_from_right" }}
-          />
-          <Stack.Screen
             name="settings/bluetooth"
             options={{ animation: "slide_from_right" }}
           />
